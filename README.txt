@@ -13,5 +13,5 @@ Requires:
 Changes:
 
 -- version 0.1.0 
-First version for despyastro 
+First version for despyastro migrated from despyutils
 
