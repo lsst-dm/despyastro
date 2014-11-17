@@ -34,3 +34,15 @@ def query2dict_of_columns(query,dbhandle,array=False):
             querydic[key] = cols[k]    
     return querydic 
 
+def query2rec(query,dbhandle):
+    """
+    Queries DB and returns results as a numpy recarray.
+    """ 
+
+    import numpy
+    # Get the cursor from the DB handle
+    cur = dbhandle.cursor()
+    # Execute
+    cur.execute(query)
+    # Return rec array
+    return np.rec.array(cur.fetchall(),names=[d[0] for d in cur.description] )
