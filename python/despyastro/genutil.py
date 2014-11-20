@@ -45,4 +45,4 @@ def query2rec(query,dbhandle):
     # Execute
     cur.execute(query)
     # Return rec array
-    return np.rec.array(cur.fetchall(),names=[d[0] for d in cur.description] )
+    return numpy.rec.array(cur.fetchall(),names=[d[0] for d in cur.description] )
