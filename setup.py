@@ -3,7 +3,7 @@ from distutils.core import setup
 
 # The main call
 setup(name='despyastro',
-      version ='0.1.0',
+      version ='0.3.0',
       license = "GPL",
       description = "A set of handy Python astro-related utility functions for DESDM",
       author = "Felipe Menanteau",
