@@ -46,28 +46,30 @@ def circle_distance(ra1,dec1,ra2,dec2,units='deg'):
     return d
 
 def deg2dec(deg,sep=":"):
+    """
+    Degrees to decimal, one element or list/array object.
+    """
+    if hasattr(deg,'__iter__'):
+        return [deg2dec_one(d,sep=sep) for d in deg]
+    else:
+        return deg2dec_one(deg,sep=sep)
+    return
 
+def deg2dec_one(deg,sep=":"):
     """
     Degrees to decimal, one element only.
     It should be generalized to an array or list of string.
     """
-
     vals = deg.split(sep)
     dd = float(vals[0])
     mm = float(vals[1])/60.
     ss = float(vals[2])/3600.
-
-    if dd < 0:
+    if dd < 0 or vals[0] == '-00' or vals[0] == '-0':
         mm = -mm
         ss = -ss
-
-    if vals[0] == '-00':
-        mm = -mm
-        ss = -ss
-
     return dd + mm + ss
 
-def dec2deg(dec,short=None,sep=":"):
+def dec2deg(dec,sep=":",plussign=False,short=False):
 
     """
     From decimal to degress, array or scalar
@@ -75,184 +77,50 @@ def dec2deg(dec,short=None,sep=":"):
 
     import numpy
     import sys
-    
+
+    # Make it a numpy object
     dec = numpy.asarray(dec)
     # Keep the sign for later
-    sig = numpy.where(dec < 0, -1, 1)
-
-    dd = dec.astype("Int32")
+    sig = numpy.where(dec < 0, -1, +1)
+    dd = abs(dec.astype("Int32"))
     mm = (abs(dec-dd)*60).astype("Int32")
     ss = (abs(dec-dd)*60 - mm)*60
+    # Make an numpy array structures -- probably unnecessary
+    x  =  numpy.concatenate((sig,dd,mm,ss))
+    # Truncating ss < 0.001
+    ids = numpy.where(abs(ss-60.) <= 1e-3)
+    ss[ids] = 0.0
+    mm[ids] = mm[ids] + 1
+    # re-shape
+    x = numpy.resize(x,(4,len(dec)))
+    x = numpy.swapaxes(x,0,1)
+    return [format_deg(element,short=short,sep=sep,plussign=plussign) for element in x]
 
-    # If not a scalar
-    if len(dec.shape) != 0:
+def format_deg(x,short=False,sep=":",plussign=False):
 
-        x  =  numpy.concatenate((sig,dd,mm,ss))
-        ids = numpy.where(abs(ss-60.) <= 1e-3)
-        #print "IDS",ids
-        ss[ids] = 0.0
-        mm[ids] = mm[ids] + 1
+    sign,dd,mm,ss = x
 
-        #n = len(dec)
-        #x =  x.resize(3,len(dec)) # old numarray
-        x =  numpy.resize(x,(4,len(dec)))
-        #x.swapaxes(0,1) # old numarray
-        x = numpy.swapaxes(x,0,1)
-        if short:
-            return map(format_deg_short,x)
-        else:
-            return map(format_deg_long,x)
-
-    else:
-        if float(abs(ss-60.)) < 1e-3 :
-            ss = 0.0
-            mm = mm + 1
-        return format_deg( (sig,dd,mm,ss),short, sep)
-
-    return
-
-def dec2deg_short(dec):
-
-    import numpy
-    
-    """
-    From decimal to degress, array or scalar
-    """
-
-    dec = numpy.asarray(dec)
-    dd = dec.astype("Int32")
-    mm = (abs(dec-dd)*60).astype("Int32")
-    ss = (abs(dec-dd)*60 - mm)*60
-    x  =  numpy.concatenate((dd,mm,ss))
-
-    # If not a scalar
-    if len(dec.shape) != 0:
-
-        ids = numpy.where(abs(ss-60.) <= 1e-3)
-        print "IDS",ids
-        ss[ids] = 0.0
-        mm[ids] = mm[ids] + 1
-
-        #n = len(dec)
-        x =  x.resize(3,len(dec))
-        x.swapaxes(0,1)
-        return map(format_deg_short,x)
-
-    else:
-        if float(abs(ss-60.)) < 1e-3 :
-            ss = 0.0
-            mm = mm + 1
-        return format_deg_short( (dd,mm,ss))
-
-    return
-
-
-def dec2deg_simple(dec):
-
-    """From decimal to degrees, only scalar"""
-
-    dd = int(dec)
-    mm = int( abs(dec-dd)*60.)
-    ss = (abs(dec-dd)*60 - mm)*60
-
-    if abs(ss-60)< 1e-5:
-        ss = 0.0
-        mm = mm + 1
-    return dd,mm,ss
-
-
-def format_deg(x,short,sep=":"):
-
-    if x[0]<0:
+    if sign < 0:
         sig = "-"
     else:
-        sig = ""
+        if plussign:     sig = "+"
+        if not plussign: sig = "" 
 
-    f1 = "%2d"
-
-    if abs(float(x[1])) < 10: 
-        f1 = "0%1d"
-    else:
-        f1 = "%2d"
-
-    if float(x[2]) < 10: 
-        f2 = "0%1d"
-    else:
-        f2 = "%2d"
-
-    if float(x[3]) < 9.99:
-        f3 = "0%.2f"
-    else:
-        f3 = "%.2f"
+    # Zero padded formatting for fields
+    f1 = "%02d"
+    f2 = sep+"%02d"
+    f3 = sep+"%04.1f" 
 
     if short=='ra':
         format = sig+f1+sep+f2+".%1d"
-        return format % (abs(x[1]),x[2],int(x[3]/6))
+        return format % (abs(dd),mm,int(ss/6))
     
-    if short:
+    elif short:
         format = sig+f1+sep+f2
-        return format % (abs(x[1]),x[2])
+        return format % (abs(dd),mm)
 
     format = sig + f1+ sep +f2+ sep +f3
-    return (format % (abs(x[1]),x[2],x[3]))[:-1]
-
-
-# doesn't work for dec -00:01:23 ....
-def format_deg_old(x,short,sep=":"):
-
-    f1 = "%2d"
-
-    if abs(float(x[0])) < 10: 
-        f1 = "0%1d"
-    else:
-        f1 = "%2d"
-
-    if float(x[1]) < 10: 
-        f2 = "0%1d"
-    else:
-        f2 = "%2d"
-
-    if float(x[2]) < 9.9:
-        f3 = "0%.1f"
-    else:
-        f3 = "%.1f"
-
-    if short:
-        format = f1+sep+f2
-        return format % (x[0],x[1])
-
-    format = f1+ sep +f2+ sep +f3
-    return format % (x[0],x[1],x[2])
-
-def format_deg_long(x):
-    return format_deg(x,short=None,sep=":")
-    
-def format_deg_short(x):
-
-    if x[0]<0:
-        sig = "-"
-    else:
-        sig = "+"
-    
-    if abs(float(x[1])) < 10: 
-        f1 = "0%1d"
-    else:
-        f1 = "%2d"
-        
-    if abs(float(x[2])) < 10: 
-        f2 = "0%1d"
-    else:
-        f2 = "%2d"
-
-    if float(x[3]) < 10:
-        f3 = "0%.1f"
-    else:
-        f3 = "%.1f"
-
-    format = sig+f1+":"+f2
-    return format % (abs(x[1]),x[2])
-
-
+    return format % (abs(dd),mm,ss)
 
 def sky_area(ra,dec,units='degrees'):
 
