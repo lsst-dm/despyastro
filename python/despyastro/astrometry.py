@@ -69,7 +69,7 @@ def deg2dec_one(deg,sep=":"):
         ss = -ss
     return dd + mm + ss
 
-def dec2deg(dec,sep=":",plussign=False,short=False):
+def dec2deg(dec,sep=":",plussign=True,short=False,sectol=1e-3):
 
     """
     From decimal to degress, array or scalar
@@ -77,24 +77,41 @@ def dec2deg(dec,sep=":",plussign=False,short=False):
 
     import numpy
     import sys
+    import math
 
-    # Make it a numpy object
-    dec = numpy.asarray(dec)
-    # Keep the sign for later
-    sig = numpy.where(dec < 0, -1, +1)
-    dd = abs(dec.astype("Int32"))
-    mm = (abs(dec-dd)*60).astype("Int32")
-    ss = (abs(dec-dd)*60 - mm)*60
-    # Make an numpy array structures -- probably unnecessary
-    x  =  numpy.concatenate((sig,dd,mm,ss))
-    # Truncating ss < 0.001
-    ids = numpy.where(abs(ss-60.) <= 1e-3)
-    ss[ids] = 0.0
-    mm[ids] = mm[ids] + 1
-    # re-shape
-    x = numpy.resize(x,(4,len(dec)))
-    x = numpy.swapaxes(x,0,1)
-    return [format_deg(element,short=short,sep=sep,plussign=plussign) for element in x]
+    # Make it a numpy object if iterable
+    if hasattr(dec,'__iter__'):
+        dec = numpy.asarray(dec)
+        # Keep the sign for later
+        sig = numpy.where(dec < 0, -1, +1)
+        dd = abs(dec.astype("Int32"))
+        mm = (abs(dec-dd)*60).astype("Int32")
+        ss = (abs(dec-dd)*60 - mm)*60
+        # Truncating ss < 0.001
+        ids = numpy.where(abs(ss-60.) <= sectol)
+        ss[ids] = 0.0
+        mm[ids] = mm[ids] + 1
+        
+        # Make an numpy array structures -- probably unnecessary
+        x  =  numpy.concatenate((sig,dd,mm,ss))
+        # re-shape
+        x = numpy.resize(x,(4,len(dec)))
+        x = numpy.swapaxes(x,0,1)
+        return [format_deg(element,short=short,sep=sep,plussign=plussign) for element in x]
+
+    else:
+        sig = math.copysign(1,dec)
+        dd = int(dec)
+        mm = int( abs(dec-dd)*60.)
+        ss = (abs(dec-dd)*60 - mm)*60
+        
+        if float(abs(ss-60.)) < sectol :
+            ss = 0.0
+            mm = mm + 1
+        return format_deg((sig,dd,mm,ss),short=short,sep=sep,plussign=plussign)
+
+    return
+
 
 def format_deg(x,short=False,sep=":",plussign=False):
 
