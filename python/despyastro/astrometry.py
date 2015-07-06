@@ -69,7 +69,7 @@ def deg2dec_one(deg,sep=":"):
         ss = -ss
     return dd + mm + ss
 
-def dec2deg(dec,sep=":",plussign=True,short=False,sectol=1e-3):
+def dec2deg(dec,sep=":",plussign=False,short=False,sectol=1e-3):
 
     """
     From decimal to degress, array or scalar
