@@ -184,3 +184,24 @@ def sky_area(ra,dec,units='degrees'):
         area = area*sterad2degsq
 
     return area
+
+
+def get_pixelscale(header,units='arcsec'):
+    """
+    Returns the pixel-scale from the CDX_X matrix in an WCS-compiant header
+    """
+    import math
+    if units == 'arcsec':
+        scale = 3600
+    elif units == 'arcmin':
+        scale = 60
+    elif units == 'degree':
+        scale = 1
+    else:
+        raise ValueError("must define units as arcses/arcmin/degree only")
+
+    CD1_1 = header['CD1_1']
+    CD1_2 = header['CD1_2']
+    CD2_1 = header['CD2_1']
+    CD2_2 = header['CD2_2']
+    return scale*math.sqrt( abs(CD1_1*CD2_2-CD1_2*CD2_1) )

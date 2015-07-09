@@ -21,3 +21,7 @@ Added genutils, migrated partly from despyutils
 -- version 0.3.0 (Dec 2014).
 Added query2rec(query,dbhandle) (by Alex Drlica-Wagner) to genutils.py
 and made genutils visible at root via _init__.py
+
+-- version 0.3.1 (July 2015)
+Re-worked function to transform dec2deg and deg2dec in astrometry
+Added function to get pixel-scale from fitsheader matrix CDXX
