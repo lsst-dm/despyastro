@@ -25,3 +25,7 @@ and made genutils visible at root via _init__.py
 -- version 0.3.1 (July 2015)
 Re-worked function to transform dec2deg and deg2dec in astrometry
 Added function to get pixel-scale from fitsheader matrix CDXX
+
+-- version 0.3.2 (July 2015)
+Minor changes to the  genutils.query2rec() function that now returns
+False (instead of crashing) when the query returns empty.
