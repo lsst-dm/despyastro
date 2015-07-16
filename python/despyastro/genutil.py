@@ -34,7 +34,7 @@ def query2dict_of_columns(query,dbhandle,array=False):
             querydic[key] = cols[k]    
     return querydic 
 
-def query2rec(query,dbhandle):
+def query2rec(query,dbhandle,verb=False):
     """
     Queries DB and returns results as a numpy recarray.
     """ 
@@ -51,5 +51,5 @@ def query2rec(query,dbhandle):
         names  = [d[0] for d in cur.description]
         return numpy.rec.array(tuples,names=names)
     else:
-        print "# WARNING DB Query in query2rec() returned no results"
+        if verb: print "# WARNING DB Query in query2rec() returned no results"
 	return False
