@@ -44,5 +44,12 @@ def query2rec(query,dbhandle):
     cur = dbhandle.cursor()
     # Execute
     cur.execute(query)
-    # Return rec array
-    return numpy.rec.array(cur.fetchall(),names=[d[0] for d in cur.description] )
+    tuples = cur.fetchall()
+
+    # Return rec array                                                                                                                                          
+    if len(tuples)>0:
+        names  = [d[0] for d in cur.description]
+        return numpy.rec.array(tuples,names=names)
+    else:
+        print "# WARNING DB Query in query2rec() returned no results"
+	return False
