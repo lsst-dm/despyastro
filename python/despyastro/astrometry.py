@@ -17,6 +17,7 @@ The functions will:
  
 """
 
+
 def circle_distance(ra1,dec1,ra2,dec2,units='deg'):
     """
     Calculates great-circle distances between the two points that is,
@@ -205,3 +206,28 @@ def get_pixelscale(header,units='arcsec'):
     CD2_1 = header['CD2_1']
     CD2_2 = header['CD2_2']
     return scale*math.sqrt( abs(CD1_1*CD2_2-CD1_2*CD2_1) )
+
+def update_wcs_matrix(header,x0,y0,naxis1,naxis2):
+    
+    """
+    Update the wcs header object with the right CRPIX[1,2] CRVAL[1,2] for a given subsection
+    """
+
+    import copy
+    from despyastro import wcsutil
+
+    # We need to make a deep copy/otherwise if fails
+    h = copy.deepcopy(header)
+    # Get the wcs object
+    wcs = wcsutil.WCS(h)
+    # Recompute CRVAL1/2 on the new center x0,y0
+    CRVAL1,CRVAL2 = wcs.image2sky(x0,y0)
+    # Asign CRPIX1/2 on the new image
+    CRPIX1 = int(naxis1/2.0)
+    CRPIX2 = int(naxis2/2.0)
+    # Update the values
+    h['CRVAL1'] = CRVAL1
+    h['CRVAL2'] = CRVAL2
+    h['CRPIX1'] = CRPIX1
+    h['CRPIX2'] = CRPIX2
+    return h
