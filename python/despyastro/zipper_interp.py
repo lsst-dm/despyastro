@@ -148,7 +148,8 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
        'min_cols': Minimum width of region to be interpolated.
        'max_cols': Maximum width of region to be interpolated.
        'logger' : Logger object for logging info
-
+       'xblock' : x-size of the zipper block columns
+       'add_noise' : Add poison noise to the zipper
     """
 
     # Extract kwargs for optional params
