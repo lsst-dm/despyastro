@@ -149,23 +149,23 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
        'max_cols': Maximum width of region to be interpolated.
        'logger' : Logger object for logging info
 
-
-
     """
 
     # Extract kwargs for optional params
     BADPIX_INTERP = kwargs.get('BADPIX_INTERP',None)
-    min_cols = kwargs.get('DEFAULT_MINCOLS',DEFAULT_MINCOLS)
-    max_cols = kwargs.get('DEFAULT_MAXCOLS',DEFAULT_MAXCOLS)
-    logger   = kwargs.get('logger',None)
+    min_cols   = kwargs.get('DEFAULT_MINCOLS',DEFAULT_MINCOLS)
+    max_cols   = kwargs.get('DEFAULT_MAXCOLS',DEFAULT_MAXCOLS)
+    logger     = kwargs.get('logger',None)
+    xblock     = kwargs.get('xblock',1)
+    add_noise  = kwargs.get('add_noise',False)
     
-    msg = 'Zipper interpolation along columns'
+    msg = 'Zipper interpolation along columns '
+    msg = msg + "with xblock=%s and add_noise=%s" % (xblock,add_noise)
     if logger:logger.info(msg)
     else: print "#",msg
 
     # Find the pixels to work with
     interpolate = np.array(mask & interp_mask, dtype=bool)
-
     # Identify column runs to interpolate, start by marking beginnings of runs
     work = np.array(interpolate)
     work[1:,:] = np.logical_and(interpolate[1:,:], ~interpolate[:-1,:])
@@ -193,14 +193,33 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
     ystart = ystart[use]
     yend   = yend[use]
     xstart = xstart[use]
-
+    
     # Assign mean of top and bottom to runs
     for run in range(len(xstart)):
-        image[ystart[run]:yend[run],xstart[run]] = \
-          0.5*(image[ystart[run]-1,xstart[run]] +
-               image[yend[run],xstart[run]])
+
+        x0 = xstart[run]
+        y1 = ystart[run] # y_lower index
+        y2 = yend[run]   # y_upper index
+
+        #if xblock > 0: # Block zipper
+        x1 = max(0,x0-xblock+1)
+        x2 = min(image.shape[1],x0+xblock)
+        im_vals = np.append(image[y1-1,x1:x2],image[y1-1,x1:x2])
+        mu  = im_vals.mean()
+        if mu > 0 and add_noise:
+            image[y1:y2,x0] = np.random.poisson(mu,y2-y1)
+        else:
+            image[y1:y2,x0] = mu
+
         if BADPIX_INTERP:
-            mask[ystart[run]:yend[run],xstart[run]] |= BADPIX_INTERP
+            mask[y1:y2,x0] |= BADPIX_INTERP
+        
+        # old method -- produces double detection on saturated stars
+        #image[ystart[run]:yend[run],xstart[run]] = \
+        #  0.5*(image[ystart[run]-1,xstart[run]] +
+        #       image[yend[run],xstart[run]])
+        #if BADPIX_INTERP:
+        #    mask[ystart[run]:yend[run],xstart[run]] |= BADPIX_INTERP
 
     # Change the bit in the mask to reflect the pixel was interpolated
     if BADPIX_INTERP:
