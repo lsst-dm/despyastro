@@ -158,7 +158,9 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
     max_cols   = kwargs.get('DEFAULT_MAXCOLS',DEFAULT_MAXCOLS)
     logger     = kwargs.get('logger',None)
     xblock     = kwargs.get('xblock',1)
+    yblock     = kwargs.get('yblock',1)
     add_noise  = kwargs.get('add_noise',False)
+    
     
     msg = 'Zipper interpolation along columns '
     msg = msg + "with xblock=%s and add_noise=%s" % (xblock,add_noise)
@@ -205,9 +207,21 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
         #if xblock > 0: # Block zipper
         x1 = max(0,x0-xblock+1)
         x2 = min(image.shape[1],x0+xblock)
-        im_vals = np.append(image[y1-1,x1:x2],image[y1-1,x1:x2])
+
+        # Get the edge values at (y1,y2)
+        im_vals = np.append(image[y1-1,x1:x2],image[y2,x1:x2])
         mu  = im_vals.mean()
-        if mu > 0 and add_noise:
+
+        if yblock>1:
+            dy = yblock
+            im_vals = np.append(image[y1-dy:y1,x1:x2],image[y2:y2+dy,x1:x2])
+            mu  = np.median(im_vals)
+            y1 = y1-dy
+            y2 = y2+dy
+        else:
+            im_vals = np.append(image[y1-1,x1:x2],image[y2,x1:x2])
+            mu  = np.median(im_vals)
+        if mu > 1 and add_noise:
             image[y1:y2,x0] = np.random.poisson(mu,y2-y1)
         else:
             image[y1:y2,x0] = mu
@@ -215,7 +229,7 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
         if BADPIX_INTERP:
             mask[y1:y2,x0] |= BADPIX_INTERP
         
-        # old method -- produces double detection on saturated stars
+        # old method 
         #image[ystart[run]:yend[run],xstart[run]] = \
         #  0.5*(image[ystart[run]-1,xstart[run]] +
         #       image[yend[run],xstart[run]])
