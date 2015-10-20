@@ -159,6 +159,7 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
     logger     = kwargs.get('logger',None)
     xblock     = kwargs.get('xblock',1)
     yblock     = kwargs.get('yblock',1)
+    ydilate    = kwargs.get('ydilate',0)
     add_noise  = kwargs.get('add_noise',False)
     
     
@@ -204,7 +205,7 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
         y1 = ystart[run] # y_lower index
         y2 = yend[run]   # y_upper index
 
-        #if xblock > 0: # Block zipper
+        #if xblock > 0: # Block x-zipper
         x1 = max(0,x0-xblock+1)
         x2 = min(image.shape[1],x0+xblock)
 
@@ -214,13 +215,16 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
 
         if yblock>1:
             dy = yblock
-            im_vals = np.append(image[y1-dy:y1,x1:x2],image[y2:y2+dy,x1:x2])
+            im_vals = np.append(image[y1-yblock:y1,x1:x2],image[y2:y2+yblock,x1:x2])
             mu  = np.median(im_vals)
-            y1 = y1-dy
-            y2 = y2+dy
         else:
             im_vals = np.append(image[y1-1,x1:x2],image[y2,x1:x2])
             mu  = np.median(im_vals)
+
+        if ydilate > 0:
+            y1 = y1 - int(ydilate)
+            y2 = y2 + int(ydilate)
+
         if mu > 1 and add_noise:
             image[y1:y2,x0] = np.random.poisson(mu,y2-y1)
         else:
