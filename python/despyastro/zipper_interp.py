@@ -149,6 +149,8 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
        'max_cols': Maximum width of region to be interpolated.
        'logger' : Logger object for logging info
        'xblock' : x-size of the zipper block columns
+       'yblock' : y-size of the zipper block columns
+       'ydiltate' : number of pixels to dilate in the y-axis
        'add_noise' : Add poison noise to the zipper
     """
 
@@ -198,7 +200,7 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
     yend   = yend[use]
     xstart = xstart[use]
     
-    # Assign mean of top and bottom to runs
+    # Loop over
     for run in range(len(xstart)):
 
         x0 = xstart[run]
@@ -233,13 +235,6 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
         if BADPIX_INTERP:
             mask[y1:y2,x0] |= BADPIX_INTERP
         
-        # old method 
-        #image[ystart[run]:yend[run],xstart[run]] = \
-        #  0.5*(image[ystart[run]-1,xstart[run]] +
-        #       image[yend[run],xstart[run]])
-        #if BADPIX_INTERP:
-        #    mask[ystart[run]:yend[run],xstart[run]] |= BADPIX_INTERP
-
     # Change the bit in the mask to reflect the pixel was interpolated
     if BADPIX_INTERP:
         return image,mask
