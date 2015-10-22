@@ -29,3 +29,7 @@ Added function to get pixel-scale from fitsheader matrix CDXX
 -- version 0.3.2 (July 2015)
 Minor changes to the  genutils.query2rec() function that now returns
 False (instead of crashing) when the query returns empty.
+
+-- version 0.3.2 (Oct 2015)
+Added zipper_interp.py module to perform zipper interpolation alongs
+rows and columns
