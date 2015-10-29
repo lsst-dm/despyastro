@@ -10,7 +10,7 @@
 
 from despyastro import wcsutil
 
-def CCD_Corners(indict):
+def CCD_corners(indict):
 
    #  DESDM CCD Image Corner Coordinates definitions for DECam
    #  see: https://desdb.cosmology.illinois.edu/confluence/display/PUB/CCD+Image+Corners+Coordinates
