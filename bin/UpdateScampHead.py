@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# $Id: split_head.py 40435 2015-10-19 20:26:15Z mgower $
+# $Id$
 # $Rev::                                  $:  # Revision of last commit.
-# $LastChangedBy:: mgower                 $:  # Author of last commit.
-# $LastChangedDate:: 2015-10-19 15:26:15 #$:  # Date of last commit.
+# $LastChangedBy::                        $:  # Author of last commit.
+# $LastChangedDate::                      $:  # Date of last commit.
 
 import argparse
 import shutil
@@ -32,7 +32,7 @@ if __name__ == "__main__":
        2) FWHM information based on the SCAMP input catalog
     """
 
-    svnid="$Id: UpdateScampHead.py 39583 2015-08-06 20:26:05Z rgruendl $"
+    svnid="$Id$"
     svnrev=svnid.split(" ")[2]
 
     parser = argparse.ArgumentParser(description='Update FITS header based on new WCS solution from SCAMP')
