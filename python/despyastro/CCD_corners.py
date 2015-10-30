@@ -5,9 +5,6 @@
 # $LastChangedBy::                        $:  # Author of last commit.
 # $LastChangedDate::                      $:  # Date of last commit.
 
-# RAG add imports
-# RAG move to despyastro
-
 from despyastro import wcsutil
 
 def CCD_corners(indict):
