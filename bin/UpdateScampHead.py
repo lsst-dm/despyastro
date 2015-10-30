@@ -20,7 +20,7 @@ import numpy
 
 from despyastro.fwhmFromFITS_LDAC import fwhmFromFITS_LDAC
 from despyastro.CCD_corners import CCD_corners
-from databaseapps.xmlslurp import Xmlslurper
+from despymisc.xmlslurp import Xmlslurper
 
 ####################################
 
@@ -29,17 +29,35 @@ if __name__ == "__main__":
     Utility to obtain WCS header update information from SCAMP .head file and 
     update a FITS file with the appropriate keywords.  Optional arguments exist
     to 1) obtain QA information from the SCAMP XML output and
-       2) FWHM information based on the SCAMP input catalog
+       2) FWHM information based on the SCAMP input catalog.
+
+    The header update file provides a list of keywords to attempt to update.
+    Each line describes a single header keyword to be updated.  Lines beginning
+    with a hashmark '#' are ignored.  Within each line five, semi-colon,
+    delimited fields are expected (when parsed, leading/trailing whitespace 
+    will be ignored).  The five fields are:  
+        (1) a name (a unique string per line... in case there are multiple
+                ways a header entry needs to be expressed in different HDUs
+        (2) FITS keyword
+        (3) data type [str,int,float]
+        (4) comment field (string... semi-colons are verbotten)
+        (5) HDU(s) for this update to be applied.  A comma-delimited list 
+                of HDUs indicated as numeric and/or names (i.e. EXTNAME)
+
+    NOTE: Previous versions of this utility would update keywords where no
+          value was known with either a blank string, 0.0, or 0 (depending 
+          on the data type).  The current version will only do this for two
+          special cases (the PV1_3 and PV2_3 keywords). 
     """
 
     svnid="$Id$"
     svnrev=svnid.split(" ")[2]
 
     parser = argparse.ArgumentParser(description='Update FITS header based on new WCS solution from SCAMP')
-    parser.add_argument('-i', '--input',   action='store', type=str, default=None, help='Input Image (to be updated)')
-    parser.add_argument('-o', '--output',  action='store', type=str, default=None, help='Output Image (updated image)')
-    parser.add_argument('--headfile',      action='store', type=str, default=None, help='Headfile (containing most update information)')
-    parser.add_argument('--hdupcfg',       action='store', type=str, default=None, help='Configuration file for header update')
+    parser.add_argument('-i', '--input',   action='store', type=str, default=None, required=True, help='Input Image (to be updated)')
+    parser.add_argument('-o', '--output',  action='store', type=str, default=None, required=True, help='Output Image (updated image)')
+    parser.add_argument('--headfile',      action='store', type=str, default=None, required=True, help='Headfile (containing most update information)')
+    parser.add_argument('--hdupcfg',       action='store', type=str, default=None, required=True, help='Configuration file for header update')
     parser.add_argument('-f', '--fwhm',    action='store', type=str, default=None, help='update FWHM (argument is a FITS_LDAC catalog to be used to determine the FWHM)')
     parser.add_argument('--xml',            action='store', type=str, default=None, help='obtain limited QA info from SCAMP XML output (optional)')
     parser.add_argument('--debug',         action='store_true', default=False, help='Full debug information to stdout')
@@ -50,17 +68,6 @@ if __name__ == "__main__":
         print "Running %s " % svnid
         print "##### Initial arguments #####"
         print "Args: ",args
-#
-#   Check manditory arguments
-#
-    if ((args.input is None)or(args.output is None)or(args.headfile is None)or(args.hdupcfg is None)):
-        print("Missing mandatory argument(s)")
-        if (args.input is None): print "  --input"
-        if (args.output is None): print "  --output"
-        if (args.headfile is None): print "  --headfile"
-        if (args.hdupcfg is None): print " --hdupcfg"
-        exit(1)
-
 #
 #   If args.fwhm then attempt to populate FWHM, ELLIPTIC, NFWHMCNT keywords 
 #
@@ -80,11 +87,9 @@ if __name__ == "__main__":
         tmpdict['FWHM']     = [round(fwhm_med,4),'Median FWHM from SCAMP input catalog [pixels]']   
         tmpdict['ELLIPTIC'] = [round(ellp_med,4),'Median Ellipticity from SCAMP input catalog']   
         tmpdict['NFWHMCNT'] = [count,'Number of objects used to find FWHM']
-
 #    
 #   If args.xml is present then try to "slurp" the SCAMP XML output for some additional quantities.  
 #    
-
     if (args.xml is not None):
         if (args.verbose): 
             print("Reading SCAMP XML file: {:s}".format(args.xml))
@@ -225,7 +230,7 @@ if __name__ == "__main__":
     tmpdict['NAXIS2'] = infit_header['NAXIS2']
 
     # Compute and Add RA,DEC High Low values to the key/val dictionary
-    (ra0,dec0,rac1,decc1,rac2,decc2,rac3,decc3,rac4,decc4) = escorners(tmpdict)
+    (ra0,dec0,rac1,decc1,rac2,decc2,rac3,decc3,rac4,decc4) = CCD_corners(tmpdict)
     tmpdict['RA_CENT']  = [ra0,'RA center']
     tmpdict['DEC_CENT'] = [dec0,'DEC center']
     tmpdict['RAC1']     = [rac1,'RA corner 1']
