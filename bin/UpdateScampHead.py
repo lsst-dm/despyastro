@@ -353,7 +353,7 @@ if __name__ == "__main__":
         for key in sorted(kywds_dct[hdu].iterkeys()):
             if (args.debug): 
                 print "   %s = %s / %s" % (key,kywds_dct[hdu][key][0],kywds_dct[hdu][key][1])
-                hdr[key]=(kywds_dct[hdu][key][0],kywds_dct[hdu][key][1])
+            hdr[key]=(kywds_dct[hdu][key][0],kywds_dct[hdu][key][1])
     if (args.verbose): 
         print "(UpdateScampHead): Closing/Saving image --> %s" % hdulist.filename()
     hdulist.close()
