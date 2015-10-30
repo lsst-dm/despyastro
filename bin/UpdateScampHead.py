@@ -68,6 +68,7 @@ if __name__ == "__main__":
         print "Running %s " % svnid
         print "##### Initial arguments #####"
         print "Args: ",args
+###################################################
 #
 #   If args.fwhm then attempt to populate FWHM, ELLIPTIC, NFWHMCNT keywords 
 #
@@ -87,7 +88,8 @@ if __name__ == "__main__":
         tmpdict['FWHM']     = [round(fwhm_med,4),'Median FWHM from SCAMP input catalog [pixels]']   
         tmpdict['ELLIPTIC'] = [round(ellp_med,4),'Median Ellipticity from SCAMP input catalog']   
         tmpdict['NFWHMCNT'] = [count,'Number of objects used to find FWHM']
-#    
+###################################################
+#
 #   If args.xml is present then try to "slurp" the SCAMP XML output for some additional quantities.  
 #    
     if (args.xml is not None):
@@ -106,7 +108,8 @@ if __name__ == "__main__":
                 for key in tmp_xml_tbl['FGroups']:
                     print "  %s = %s" % (key,tmp_xml_tbl['FGroups'][key])
 #
-#           The keys we might be looking for (basically the translation between XML field names and FITS header keywords).
+#           Here is where I have defined the current keywords that we can obtain from Scamp XML output.
+#           Basiclly each line in key_pairs relates a fits KEYWORD to a field in the XML.
 #
             key_pairs={}
             key_pairs['SCAMPCHI']={'fld':'astromchi2_reference_highsn','type':'float','comment':'Chi2 value from SCAMP'}
@@ -145,14 +148,13 @@ if __name__ == "__main__":
                                 pass
                     else:
                         print('Unspecified value type for XML parsing of keywords (skipping)')
-
-#
+####################################################
+#   Finished with the optional parts.
 #   Put the FWHM and/or XML parameters into a keywords section
 #
     kywds_data = tmpdict
-
-#
-#   Reading the header update configuration file.
+####################################################
+#   Read in the header update configuration file.
 #
     if (not(os.path.isfile(args.hdupcfg))):
         print('Header update config file (%s) not found! ',args.hdupcfg)
@@ -186,9 +188,8 @@ if __name__ == "__main__":
             tmp_spec=kywds_spec[FieldName]
             print "     kywds_spec[%s] --> (%s = (type=%s) (comment=%s) (hdus=%s)" % (FieldName,tmp_spec['key'],tmp_spec['type'],tmp_spec['comment'],tmp_spec['hdulist'])
         print ""
-
-#
-#   Reading the .head file.
+###########################################################
+#   Reading the .head file from SCAMP
 #
     tmpdict = {}
     if (args.verbose): print("Reading SCAMP .head file: {:s}".format(args.headfile))
@@ -212,15 +213,16 @@ if __name__ == "__main__":
         key = re.sub("\s+$",'',re.sub("^\s+",'',tmplst1[0]))
         tmpdict[key] = tmplst
     finhead.close()
-
 #
+#   SPECIAL CASE
 #   If PV1_3 and PV2_3 are not defined then add with value of 0
 #
     if ('PV1_3' not in tmpdict):
         tmpdict['PV1_3']=[0.0,'Projection distortion parameter']
     if ('PV2_3' not in tmpdict):
         tmpdict['PV2_3']=[0.0,'Projection distortion parameter']
-#
+####################################################################
+#   Now some keywords that are derived based on WCS.
 #   Calculate coordinates for ccd center and corners.
 #
     if (args.verbose): print("Using new WCS to compute coordinates for CCD center and corners")
@@ -242,8 +244,8 @@ if __name__ == "__main__":
     tmpdict['RAC4']     = [rac4,'RA corner 4']
     tmpdict['DECC4']    = [decc4,'DEC corner 4']
 #
-#   Provisional functionality for Felipe's COADD queries
-#   Not yet supported in DB.
+#   Additional (provisional) quantities for Felipe's COADD queries
+#   Some may not yet be supported in DB.
 #
     ras =numpy.array([rac1,rac2,rac3,rac4])
     decs=numpy.array([decc1,decc2,decc3,decc4])
@@ -268,7 +270,10 @@ if __name__ == "__main__":
         print("     RAC3,DECC3 = {:12.7f},{:12.7f} ".format(tmpdict['RAC3'][0],tmpdict['DECC3'][0]))
         print("     RAC4,DECC4 = {:12.7f},{:12.7f} ".format(tmpdict['RAC4'][0],tmpdict['DECC4'][0]))
         print("       CROSSRA0 = {:s} ".format(tmpdict['CROSSRA0'][0]))
-
+############################################################
+#   Finished with the WCS related parts.
+#   Add results to the kywds_data dictionary (central clearing house).
+#
     for key in tmpdict:
         kywds_data[key]=tmpdict[key]
 
@@ -277,10 +282,13 @@ if __name__ == "__main__":
         for keyword in kywds_data:
             print "     kywds_data[%s] = %s" % (keyword,kywds_data[keyword])
         print ""
-
+#############################################################
+#   Now all keywords that can be found/derived should be present.
 #
-#   Merge spec and data into dictionary where keys correspond to keywords and each key points
-#   to a list where the first member is the keyword value and the second member is the comment
+#   Merge spec (what is requested for the update) with those data that have been found.
+#   Merge produces a dictionary of dictionarires (kywds_dct) where top level keys specify HDUs 
+#   and then secondary keys are KEYWORDS that will be updated... each of these points to a list
+#   where the first item is the keyword value and the second item is the comment.
 #
     if (args.verbose):
         print "(UpdateScampHead): Merging spec and data into another dictionary."
@@ -336,8 +344,7 @@ if __name__ == "__main__":
     except Exception, e:
         print "(UpdateScampHead): %s --> \"%s\"" % (e.__class__.__name__,str(e))
         exit(1)
-
-#
+################################################################
 #    Update header keywords in args.output:
 #    HDUs that receive the update are in "kywds_hdus".  
 #    Keywords and associated values and  comments are all specified in kywds_dct.  
@@ -358,6 +365,4 @@ if __name__ == "__main__":
         print "(UpdateScampHead): Closing/Saving image --> %s" % hdulist.filename()
     hdulist.close()
 
-
     exit(0)
-
