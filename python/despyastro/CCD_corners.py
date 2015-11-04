@@ -7,7 +7,7 @@
 
 from despyastro import wcsutil
 
-def CCD_corners(indict):
+def DECam_corners(indict):
 
    #  DESDM CCD Image Corner Coordinates definitions for DECam
    #  see: https://desdb.cosmology.illinois.edu/confluence/display/PUB/CCD+Image+Corners+Coordinates
@@ -55,7 +55,7 @@ def CCD_corners(indict):
    hdr['pv1_0'] = float(indict['PV1_0'][0])
    hdr['pv1_1'] = float(indict['PV1_1'][0])
    hdr['pv1_2'] = float(indict['PV1_2'][0])
-   hdr['pv1_3'] = 0                          # Felipe asks: Why hardcode 0 and not use indict[pv1_3]?
+   hdr['pv1_3'] = float(indict['PV1_3'][0])
    hdr['pv1_4'] = float(indict['PV1_4'][0])
    hdr['pv1_5'] = float(indict['PV1_5'][0])
    hdr['pv1_6'] = float(indict['PV1_6'][0])
@@ -67,7 +67,7 @@ def CCD_corners(indict):
    hdr['pv2_0'] = float(indict['PV2_0'][0])
    hdr['pv2_1'] = float(indict['PV2_1'][0])
    hdr['pv2_2'] = float(indict['PV2_2'][0])
-   hdr['pv2_3'] = 0                           # Felipe asks: Why hardcore 0 and not use indict[pv2_3]?
+   hdr['pv2_3'] = float(indict['PV2_3'][0])
    hdr['pv2_4'] = float(indict['PV2_4'][0])
    hdr['pv2_5'] = float(indict['PV2_5'][0])
    hdr['pv2_6'] = float(indict['PV2_6'][0])
