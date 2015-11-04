@@ -232,7 +232,7 @@ if __name__ == "__main__":
     tmpdict['NAXIS2'] = infit_header['NAXIS2']
 
     # Compute and Add RA,DEC High Low values to the key/val dictionary
-    (ra0,dec0,rac1,decc1,rac2,decc2,rac3,decc3,rac4,decc4) = DECam_corners(tmpdict)
+    ra0,dec0,rac1,decc1,rac2,decc2,rac3,decc3,rac4,decc4 = DECam_corners(tmpdict)
     tmpdict['RA_CENT']  = [ra0,'RA center']
     tmpdict['DEC_CENT'] = [dec0,'DEC center']
     tmpdict['RAC1']     = [rac1,'RA corner 1']

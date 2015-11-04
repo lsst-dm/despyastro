@@ -7,6 +7,19 @@
 
 from despyastro import wcsutil
 
+def DESDM_corners(hdr,border=0):
+   
+   # Short cut for less typing
+   nx = hdr['naxis1']
+   ny = hdr['naxis2']
+   wcs = wcsutil.WCS(hdr)
+   rac1,decc1 = wcs.image2sky(1+border, 1+border)
+   rac2,decc2 = wcs.image2sky(nx-border,1+border)
+   rac3,decc3 = wcs.image2sky(nx-border,ny-border)
+   rac4,decc4 = wcs.image2sky(1+border, ny-border)
+   ra0 ,dec0  = wcs.image2sky(nx/2.0, ny/2.0)
+   return ra0,dec0,rac1,decc1,rac2,decc2,rac3,decc3,rac4,decc4
+
 def DECam_corners(indict):
 
    #  DESDM CCD Image Corner Coordinates definitions for DECam
@@ -76,22 +89,4 @@ def DECam_corners(indict):
    hdr['pv2_9'] = float(indict['PV2_9'][0])
    hdr['pv2_10'] = float(indict['PV2_10'][0])
 
-   # Short cut for less typing
-   nx = hdr['naxis1']
-   ny = hdr['naxis2']
-   
-   wcs = wcsutil.WCS(hdr)
-   rac1,decc1 = wcs.image2sky(1, 1)
-   rac2,decc2 = wcs.image2sky(nx,1)
-   rac3,decc3 = wcs.image2sky(nx,ny)
-   rac4,decc4 = wcs.image2sky(1, ny)
-   ra0 ,dec0  = wcs.image2sky(nx/2.0, ny/2.0)
-
-   # What is this!!!!?????? -- Felipe asks
-   #if (rac1 > 350.0 and rac2 < 10.0):
-   #  rac1=rac1-360.0
-   #if (rac4 > 350.0 and rac3 < 10.0):
-   #  rac4=rac4-360.0
-   #print corners(indict)
-
-   return (ra0,dec0,rac1,decc1,rac2,decc2,rac3,decc3,rac4,decc4)
+   return DESDM_corners(hdr,border=0)
