@@ -253,9 +253,13 @@ if __name__ == "__main__":
     racmax=ras.max()
     if ((racmax-racmin)>180.):
         tmpdict['CROSSRA0']=['Y','Does Image Span RA 0h (Y/N)']
-        # Currently we substract 360.  Perhaps switch order instead?
-        tmpdict['RACMIN']=[(ras.max()-360.0),'Minimum extent of image in RA']
-        tmpdict['RACMAX']=[ras.min(),'Maximum extent of image in RA']
+        # Currently we switch order. Perhaps better to +/-360.0?
+        # Note we want the total extent which is not necessarily the maximum and minimum in this case
+        ras2=ras
+        wsm = numpy.where( ras < 180.0)
+        ras2[wsm]=ras[wsm]+360.
+        tmpdict['RACMIN']=[ras2.min(),'Minimum extent of image in RA']
+        tmpdict['RACMAX']=[(ras2.max()-360),'Maximum extent of image in RA']
     else:
         tmpdict['CROSSRA0']=['N','Does Image Span RA 0h (Y/N)']
         tmpdict['RACMIN']=[ras.min(),'Minimum extent of image in RA']
@@ -269,6 +273,8 @@ if __name__ == "__main__":
         print("     RAC2,DECC2 = {:12.7f},{:12.7f} ".format(tmpdict['RAC2'][0],tmpdict['DECC2'][0]))
         print("     RAC3,DECC3 = {:12.7f},{:12.7f} ".format(tmpdict['RAC3'][0],tmpdict['DECC3'][0]))
         print("     RAC4,DECC4 = {:12.7f},{:12.7f} ".format(tmpdict['RAC4'][0],tmpdict['DECC4'][0]))
+        print("  RACMIN,RACMAX = {:12.7f},{:12.7f} ".format(tmpdict['RACMIN'][0],tmpdict['RACMAX'][0]))
+        print("DECCMIN,DECCMAX = {:12.7f},{:12.7f} ".format(tmpdict['DECCMIN'][0],tmpdict['DECCMAX'][0]))
         print("       CROSSRA0 = {:s} ".format(tmpdict['CROSSRA0'][0]))
 ############################################################
 #   Finished with the WCS related parts.
