@@ -33,3 +33,10 @@ False (instead of crashing) when the query returns empty.
 -- version 0.3.2 (Oct 2015)
 Added zipper_interp.py module to perform zipper interpolation alongs
 rows and columns
+
+-- version 0.3.3 (Oct 2015)
+Minor undocumented changes
+
+-- version 0.3.4 (Nov 2015)
+Added CCD_corners.py library to consistently compute the corners and
+extend of DESDM images
