@@ -40,3 +40,8 @@ Minor undocumented changes
 -- version 0.3.4 (Nov 2015)
 Added CCD_corners.py library to consistently compute the corners and
 extend of DESDM images
+
+-- version 0.3.4 (Nov 2015)
+Minor change to update_DESDM_corners() inside CCD_corners.py to avoid
+crashing in case the corners cannot be computed. Now it simply returns
+the same header that was input.
