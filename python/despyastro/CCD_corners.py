@@ -11,7 +11,7 @@ import numpy
 def update_DESDM_corners(hdr,border=0,get_extent=False,verb=False,logger=None):
 
    mess = "Using header WCS to compute coordinates for CCD center and corners"
-   if loggger:
+   if logger:
       logger.info(mess)
    elif verb:
       print mess
@@ -22,9 +22,9 @@ def update_DESDM_corners(hdr,border=0,get_extent=False,verb=False,logger=None):
       ra0,dec0,rac1,decc1,rac2,decc2,rac3,decc3,rac4,decc4 = DESDM_corners(hdr,border=border)
    except:
       mess = "WARNING: Problem computing the DESDM_corners(), will return unchanged header"
-      if loggger:
+      if logger:
          logger.info(mess)
-      elif verb:
+      else:
          print mess
       return hdr
    
@@ -45,16 +45,16 @@ def update_DESDM_corners(hdr,border=0,get_extent=False,verb=False,logger=None):
 
    # Compute RA/DEC MINMAC and where RA crosses zero.
    if get_extent:
-         ras  = numpy.array([rac1,rac2,rac3,rac4])
-         decs = numpy.array([decc1,decc2,decc3,decc4])
 
+      ras  = numpy.array([rac1,rac2,rac3,rac4])
+      decs = numpy.array([decc1,decc2,decc3,decc4])
       try:
          RACMIN,RACMAX,DECCMIN,DECCMAX,CROSSRA0 = get_DESDM_corners_extent(ras,decs)
       except:
          mess = "WARNING: Problem computing the get_DESDM_corners_extent(), will return unchanged header"
          if loggger:
             logger.info(mess)
-         elif verb:
+         else:
             print mess
          return hdr
 
