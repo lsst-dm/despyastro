@@ -8,12 +8,26 @@
 from despyastro import wcsutil
 import numpy
 
-def update_DESDM_corners(hdr,border=0,get_extent=False,verb=False):
+def update_DESDM_corners(hdr,border=0,get_extent=False,verb=False,logger=None):
 
-   if verb: print "Using new WCS to compute coordinates for CCD center and corners" 
+   mess = "Using header WCS to compute coordinates for CCD center and corners"
+   if loggger:
+      logger.info(mess)
+   elif verb:
+      print mess
+   
    
    # Get the values
-   ra0,dec0,rac1,decc1,rac2,decc2,rac3,decc3,rac4,decc4 = DESDM_corners(hdr,border=border)
+   try:
+      ra0,dec0,rac1,decc1,rac2,decc2,rac3,decc3,rac4,decc4 = DESDM_corners(hdr,border=border)
+   except:
+      mess = "WARNING: Problem computing the DESDM_corners(), will return unchanged header"
+      if loggger:
+         logger.info(mess)
+      elif verb:
+         print mess
+      return hdr
+   
 
    # Build a list  of records in format accepted by fitsio
    reclist = [
@@ -31,9 +45,18 @@ def update_DESDM_corners(hdr,border=0,get_extent=False,verb=False):
 
    # Compute RA/DEC MINMAC and where RA crosses zero.
    if get_extent:
-      ras  = numpy.array([rac1,rac2,rac3,rac4])
-      decs = numpy.array([decc1,decc2,decc3,decc4])
-      RACMIN,RACMAX,DECCMIN,DECCMAX,CROSSRA0 = get_DESDM_corners_extent(ras,decs)
+         ras  = numpy.array([rac1,rac2,rac3,rac4])
+         decs = numpy.array([decc1,decc2,decc3,decc4])
+
+      try:
+         RACMIN,RACMAX,DECCMIN,DECCMAX,CROSSRA0 = get_DESDM_corners_extent(ras,decs)
+      except:
+         mess = "WARNING: Problem computing the get_DESDM_corners_extent(), will return unchanged header"
+         if loggger:
+            logger.info(mess)
+         elif verb:
+            print mess
+         return hdr
 
       reclist = reclist + [
          {'name': 'RACMIN',    'value': RACMIN,   'comment':'Minimum extent of image in RA'},
