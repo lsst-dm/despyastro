@@ -21,7 +21,7 @@ def zipper_interp_rows(image,mask,interp_mask,**kwargs):
 
     """
     Performs zipper row interpolation.
-    Extracted from Gary Berstein's row_interp.py inside pixcorrect
+    Based on Gary Berstein's row_interp.py inside pixcorrect
 
     Interpolate over selected pixels by inserting average of pixels to left and right
     of any bunch of adjacent selected pixels.  If the interpolation region touches an
@@ -29,13 +29,15 @@ def zipper_interp_rows(image,mask,interp_mask,**kwargs):
     other border is used for interpolation.  No interpolation is done if both
     boundary pixels are invalid.
 
-    Returns the 'image' back and if 'BADPIX_INTERP' is not None
-    it returns a tuple with image,mask
-    
     :Postional parameters:
        'image': the 2D numpy array input image
        'mask':  the 2D numpy array input image
        'interp_mask': Mask bits that will trigger interpolation
+
+    :Ouputs:
+       Returns 'image' and 'mask' as tuple.
+       If a BADPIX_INTERP value is passed then the modified mask with
+       the interpolated pixels flaged with BADPIX_INTERP will be returned
 
     :Optional parameters (passed as **kwargs)
        'BADPIX_INTERP': bit value to assign to interpolated pixels (off by default)
@@ -43,15 +45,20 @@ def zipper_interp_rows(image,mask,interp_mask,**kwargs):
        'max_cols': Maximum width of region to be interpolated.
        'invalid_mask': Mask bits invalidating a pixel as interpolation source.
        'logger' : Logger object for logging info
-
+       'block_size' : y-size of the zipper block columns
+       'ydiltate' : number of pixels to dilate in the y-axis
+       'add_noise' : Add poison noise to the zipper
     """
 
     # Extract kwargs for optional params
     BADPIX_INTERP = kwargs.get('BADPIX_INTERP',None)
     invalid_mask  = kwargs.get('invalid_mask',0)
-    min_cols = kwargs.get('DEFAULT_MINCOLS',DEFAULT_MINCOLS)
-    max_cols = kwargs.get('DEFAULT_MAXCOLS',DEFAULT_MAXCOLS)
-    logger   = kwargs.get('logger',None)
+    min_cols   = kwargs.get('DEFAULT_MINCOLS',DEFAULT_MINCOLS)
+    max_cols   = kwargs.get('DEFAULT_MAXCOLS',DEFAULT_MAXCOLS)
+    logger     = kwargs.get('logger',None)
+    yblock     = kwargs.get('block_size',1)
+    xdilate    = kwargs.get('dilate',0)
+    add_noise  = kwargs.get('add_noise',False)
     
     msg = 'Zipper interpolation along rows'
     if logger:logger.info(msg)
@@ -98,24 +105,49 @@ def zipper_interp_rows(image,mask,interp_mask,**kwargs):
     has_right = ~np.array(mask[ystart,xright] & invalid_mask, dtype=bool)
     has_right = np.logical_and(xend<work.shape[1],has_right)
     right_value = image[ystart,xright]
-        
-    # Assign right-side value to runs having just right data
-    for run in np.where(np.logical_and(~has_left,has_right))[0]:
-        image[ystart[run],xstart[run]:xend[run]] = right_value[run]
-        if BADPIX_INTERP:
-            mask[ystart[run],xstart[run]:xend[run]] |= BADPIX_INTERP
-    # Assign left-side value to runs having just left data
-    for run in np.where(np.logical_and(has_left,~has_right))[0]:
-        image[ystart[run],xstart[run]:xend[run]] = left_value[run]
-        if BADPIX_INTERP:
-            mask[ystart[run],xstart[run]:xend[run]] |= BADPIX_INTERP
 
-    # Assign mean of left and right to runs having both sides
-    for run in np.where(np.logical_and(has_left,has_right))[0]:
-        image[ystart[run],xstart[run]:xend[run]] = \
-          0.5*(left_value[run]+right_value[run])
+    # Define the type on edges/borders:
+    # - Both left and right
+    # - left only good values
+    # - right only good values
+    left_and_right = np.where(np.logical_and(has_left,has_right))[0]
+    left_only      = np.where(np.logical_and(has_left,~has_right))[0]
+    right_only     = np.where(np.logical_and(~has_left,has_right))[0]
+    all_cases      = np.concatenate((left_and_right,left_only,right_only))
+
+    # Loop over all cases (rows) to interpolate
+    for run in all_cases:
+
+        # Get the limits
+        # y0 is the row we want to interpolate
+        # x1,x2 are the right and left-hand edges of the region to interpolate
+        # y1,y2 are the lower and upper edges of the box car block
+        y0 = ystart[run]
+        x1 = xstart[run] # x_left index
+        x2 = xend[run]   # x_right index
+        y1 = max(0,y0-yblock+1)            # lower y for block
+        y2 = min(image.shape[0],y0+yblock) # upper y for block
+
+        # Decide case and from border condition
+        if run in left_only:
+            im_vals = image[y1:y2,x1-1]
+        elif run in list(right_only):
+            im_vals = image[y1:y2,x2]
+        elif run in left_and_right:
+            im_vals = np.append(image[y1:y2,x1-1],image[y1:y2,x2])
+
+        # Dilate zipper in the x-direction?
+        if xdilate > 0:
+            x1 = x1 - int(xdilate)
+            x2 = x2 + int(xdilate)
+        mu  = np.median(im_vals)
+        if mu > 1 and add_noise:
+            image[y0,x1:x2] = np.random.poisson(mu,x2-x1)
+        else:
+            image[y0,x1:x2] = mu
+
         if BADPIX_INTERP:
-            mask[ystart[run],xstart[run]:xend[run]] |= BADPIX_INTERP
+            mask[y0,x1:x2] |= BADPIX_INTERP
 
     if BADPIX_INTERP:
         return image,mask
@@ -126,7 +158,7 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
 
     """
     Performs zipper column interpolation 
-    Extracted and adapted from Gary Berstein in coadd-prepare
+    Based from Gary Berstein in coadd-prepare
 
     Interpolate over selected pixels by inserting average of pixels to
     top and bottom of any bunch of adjacent selected pixels. For
@@ -135,21 +167,22 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
     meant for coadded images, which do not have a bit to flag
     'invalid_mask.'
 
-    Returns the 'image' back and if 'BADPIX_INTERP' is not None
-    it returns a tuple with image,mask
-        
     :Postional parameters:
        'image': the 2D numpy array input image
        'mask':  the 2D numpy array input image
        'interp_mask': Mask bits that will trigger interpolation
 
-    :Optional parameters (passed as **kwargs)
+    :Ouputs:
+       Returns 'image' and 'mask' as tuple.
+       If a BADPIX_INTERP value is passed then the modified mask with
+       the interpolated pixels flaged with BADPIX_INTERP will be returned 
+
+   :Optional parameters (passed as **kwargs)
        'BADPIX_INTERP': bit value to assign to interpolated pixels (off by default)
        'min_cols': Minimum width of region to be interpolated.
        'max_cols': Maximum width of region to be interpolated.
        'logger' : Logger object for logging info
        'xblock' : x-size of the zipper block columns
-       'yblock' : y-size of the zipper block columns
        'ydiltate' : number of pixels to dilate in the y-axis
        'add_noise' : Add poison noise to the zipper
     """
@@ -160,10 +193,8 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
     max_cols   = kwargs.get('DEFAULT_MAXCOLS',DEFAULT_MAXCOLS)
     logger     = kwargs.get('logger',None)
     xblock     = kwargs.get('xblock',1)
-    yblock     = kwargs.get('yblock',1)
     ydilate    = kwargs.get('ydilate',0)
     add_noise  = kwargs.get('add_noise',False)
-    
     
     msg = 'Zipper interpolation along columns '
     msg = msg + "with xblock=%s and add_noise=%s" % (xblock,add_noise)
@@ -211,17 +242,8 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
         x1 = max(0,x0-xblock+1)
         x2 = min(image.shape[1],x0+xblock)
 
-        # Get the edge values at (y1,y2)
         im_vals = np.append(image[y1-1,x1:x2],image[y2,x1:x2])
-        mu  = im_vals.mean()
-
-        if yblock>1:
-            dy = yblock
-            im_vals = np.append(image[y1-yblock:y1,x1:x2],image[y2:y2+yblock,x1:x2])
-            mu  = np.median(im_vals)
-        else:
-            im_vals = np.append(image[y1-1,x1:x2],image[y2,x1:x2])
-            mu  = np.median(im_vals)
+        mu  = np.median(im_vals)
 
         if ydilate > 0:
             y1 = y1 - int(ydilate)
@@ -240,3 +262,7 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
         return image,mask
     else:
         return image
+
+
+
+
