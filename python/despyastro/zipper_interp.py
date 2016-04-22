@@ -23,11 +23,12 @@ def zipper_interp_rows(image,mask,interp_mask,**kwargs):
     Performs zipper row interpolation.
     Based on Gary Berstein's row_interp.py inside pixcorrect
 
-    Interpolate over selected pixels by inserting average of pixels to left and right
-    of any bunch of adjacent selected pixels.  If the interpolation region touches an
-    edge, or the adjacent pixel has flags marking it as invalid, than the value at
-    other border is used for interpolation.  No interpolation is done if both
-    boundary pixels are invalid.
+    Interpolate over selected pixels by inserting average/median of
+    pixels to left and right of any bunch of adjacent selected pixels.
+    If the interpolation region touches an edge, or the adjacent pixel
+    has flags marking it as invalid, than the value at other border is
+    used for interpolation.  No interpolation is done if both boundary
+    pixels are invalid.
 
     :Postional parameters:
        'image': the 2D numpy array input image
@@ -157,15 +158,15 @@ def zipper_interp_rows(image,mask,interp_mask,**kwargs):
 def zipper_interp_cols(image,mask,interp_mask,**kwargs):
 
     """
-    Performs zipper column interpolation 
-    Based from Gary Berstein in coadd-prepare
+    Performs zipper column interpolation.
+    Based on Gary Berstein's coadd-prepare script.
 
-    Interpolate over selected pixels by inserting average of pixels to
-    top and bottom of any bunch of adjacent selected pixels. For
-    column interpolation we do not attempt to determine invalid
-    pixels, as it is done for row_interp. The column interpolation is
-    meant for coadded images, which do not have a bit to flag
-    'invalid_mask.'
+    Interpolate over selected pixels by inserting average/median of
+    pixels to top and bottom of any bunch of adjacent selected
+    pixels. For column interpolation we do not attempt to determine
+    invalid pixels, as it is done for row_interp. The column
+    interpolation is meant for coadded images, which do not have a bit
+    to flag 'invalid_mask.'
 
     :Postional parameters:
        'image': the 2D numpy array input image
