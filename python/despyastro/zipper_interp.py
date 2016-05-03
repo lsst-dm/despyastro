@@ -150,10 +150,7 @@ def zipper_interp_rows(image,mask,interp_mask,**kwargs):
         if BADPIX_INTERP:
             mask[y0,x1:x2] |= BADPIX_INTERP
 
-    if BADPIX_INTERP:
-        return image,mask
-    else:
-        return image
+    return image,mask
 
 def zipper_interp_cols(image,mask,interp_mask,**kwargs):
 
@@ -198,7 +195,7 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
     add_noise  = kwargs.get('add_noise',False)
     
     msg = 'Zipper interpolation along columns '
-    msg = msg + "with xblock=%s and add_noise=%s" % (xblock,add_noise)
+    msg = msg + "with xblock=%s, add_noise=%s and ydilate=%s" % (xblock,add_noise,ydilate)
     if logger:logger.info(msg)
     else: print "#",msg
 
@@ -231,6 +228,10 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
     ystart = ystart[use]
     yend   = yend[use]
     xstart = xstart[use]
+
+    # Make a copy of the image that we will modify/interpolate
+    image_interp = np.copy(image)
+    mask_interp  = np.copy(mask)
     
     # Loop over
     for run in range(len(xstart)):
@@ -246,24 +247,24 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
         im_vals = np.append(image[y1-1,x1:x2],image[y2,x1:x2])
         mu  = np.median(im_vals)
 
+        # y-dilate
+        ya = y1 - int(ydilate)
+        yb = y2 + int(ydilate)
+
+        # Dilate the mask
         if ydilate > 0:
-            y1 = y1 - int(ydilate)
-            y2 = y2 + int(ydilate)
+            mask_interp[ya:yb,x0] = interp_mask
 
         if mu > 1 and add_noise:
-            image[y1:y2,x0] = np.random.poisson(mu,y2-y1)
+            image_interp[ya:yb,x0] = np.random.poisson(mu,y2-y1)
         else:
-            image[y1:y2,x0] = mu
+            image_interp[ya:yb,x0] = mu
 
+        # Change the bit in the mask to reflect the pixel was interpolated
         if BADPIX_INTERP:
-            mask[y1:y2,x0] |= BADPIX_INTERP
+            mask_interp[ya:yb,x0] |= BADPIX_INTERP
         
-    # Change the bit in the mask to reflect the pixel was interpolated
-    if BADPIX_INTERP:
-        return image,mask
-    else:
-        return image
-
-
+            
+    return image_interp,mask_interp
 
 
