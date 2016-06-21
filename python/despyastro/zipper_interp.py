@@ -2,7 +2,7 @@
 
 import numpy as np
 
-DEFAULT_MINCOLS = 1     # Narrowest feature to interpolate
+DEFAULT_MINCOLS = 1    # Narrowest feature to interpolate
 DEFAULT_MAXCOLS = None  # Widest feature to interpolate.  None means no limit.
 
 def zipper_interp(image,mask,interp_mask,axis=1,**kwargs):
@@ -54,13 +54,13 @@ def zipper_interp_rows(image,mask,interp_mask,**kwargs):
     # Extract kwargs for optional params
     BADPIX_INTERP = kwargs.get('BADPIX_INTERP',None)
     invalid_mask  = kwargs.get('invalid_mask',0)
-    min_cols   = kwargs.get('DEFAULT_MINCOLS',DEFAULT_MINCOLS)
-    max_cols   = kwargs.get('DEFAULT_MAXCOLS',DEFAULT_MAXCOLS)
-    logger     = kwargs.get('logger',None)
-    yblock     = kwargs.get('block_size',1)
-    xdilate    = kwargs.get('dilate',0)
-    add_noise  = kwargs.get('add_noise',False)
-    
+    min_cols    = kwargs.get('DEFAULT_MINCOLS',DEFAULT_MINCOLS)
+    max_cols    = kwargs.get('DEFAULT_MAXCOLS',DEFAULT_MAXCOLS)
+    logger      = kwargs.get('logger',None)
+    yblock      = kwargs.get('block_size',1)
+    xdilate     = kwargs.get('dilate',0)
+    add_noise   = kwargs.get('add_noise',False)
+
     msg = 'Zipper interpolation along rows'
     if logger:logger.info(msg)
     else: print "#",msg
@@ -191,11 +191,25 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
     max_cols   = kwargs.get('DEFAULT_MAXCOLS',DEFAULT_MAXCOLS)
     logger     = kwargs.get('logger',None)
     xblock     = kwargs.get('xblock',1)
+    yblock     = kwargs.get('yblock',1)
     ydilate    = kwargs.get('ydilate',0)
     add_noise  = kwargs.get('add_noise',False)
-    
+    region_file = kwargs.get('region_file',None) 
+
+    if yblock < 0:
+        yblock = 1
+        msg = "yblock must be >= 0 -- forcing yblock=1" 
+        if logger:logger.info(msg)
+        else: print "#",msg
+
+    if region_file:
+        msg = "Will write ds9 regions to %s" % region_file
+        reg = open(region_file,'w')
+        if logger:logger.info(msg)
+        else: print "#",msg
+
     msg = 'Zipper interpolation along columns '
-    msg = msg + "with xblock=%s, add_noise=%s and ydilate=%s" % (xblock,add_noise,ydilate)
+    msg = msg + "with xblock=%s, yblock=%s, maxcols=%s, mincols=%s, add_noise=%s, ydilate=%s" % (xblock,yblock, max_cols, min_cols, add_noise,ydilate)
     if logger:logger.info(msg)
     else: print "#",msg
 
@@ -218,8 +232,7 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
         print xstart,xend ###
         return 1
 
-    # Narrow our list to runs of the desired length range and
-    # not touching the edges
+    # Narrow our list to runs of the desired length
     use = yend-ystart >= min_cols
     if max_cols is not None:
         use = np.logical_and(yend-ystart<=max_cols, use)
@@ -237,15 +250,34 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
     for run in range(len(xstart)):
 
         x0 = xstart[run]
-        y1 = ystart[run] # y_lower index
-        y2 = yend[run]   # y_upper index
+        y1 = ystart[run]    # y_lower index
+        y2 = yend[run] - 1  # y_upper index
 
-        #if xblock > 0: # Block x-zipper
+        # Block x-zipper
         x1 = max(0,x0-xblock+1)
         x2 = min(image.shape[1],x0+xblock)
 
-        im_vals = np.append(image[y1-1,x1:x2],image[y2,x1:x2])
-        mu  = np.median(im_vals)
+        # Block y-zipper limits
+        if yblock > 0:
+            y1a = max(0,y1-yblock)
+        else:
+            y1a = max(0,y1-1)
+        y1b = min(image.shape[0],y1)
+
+        y2a = max(0,y2)
+        y2b = min(image.shape[0],y2+yblock)
+        im_vals = np.append(image[y1a:y1b,x1:x2],image[y2a:y2b,x1:x2])
+
+        # We want to avoid the zero values we encounter in the sapling
+        idx  = np.where(im_vals != 0)
+        n_good = len(idx[0])
+        if n_good > 3:
+            mu  = np.median(im_vals[idx])
+        else: # Fall back in case they are all zero
+            msg = "WARNING: All sampling values equal to zero on slices [%s:%s,%s:%s] and [%s:%s,%s:%s]" % (y1a,y1b,x1,x2, y2a,y2b,x1,x2)
+            if logger:logger.info(msg)
+            else: print "#",msg
+            mu  = im_vals.mean()
 
         # y-dilate
         ya = y1 - int(ydilate)
@@ -256,13 +288,18 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
             mask_interp[ya:yb,x0] = interp_mask
 
         if mu > 1 and add_noise:
-            image_interp[ya:yb,x0] = np.random.poisson(mu,y2-y1)
+            image_interp[ya:yb,x0] = np.random.poisson(mu,yb-ya)
         else:
             image_interp[ya:yb,x0] = mu
 
         # Change the bit in the mask to reflect the pixel was interpolated
         if BADPIX_INTERP:
             mask_interp[ya:yb,x0] |= BADPIX_INTERP
+
+        if region_file:
+            reg.write("line %s %s %s %s\n" % (x0+1,y1+1,x0+1,y2+1))
+
+
         
             
     return image_interp,mask_interp
