@@ -181,19 +181,21 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
        'max_cols': Maximum width of region to be interpolated.
        'logger' : Logger object for logging info
        'xblock' : x-size of the zipper block columns
+       'yblock' : y-size of the zipper block columns
        'ydiltate' : number of pixels to dilate in the y-axis
        'add_noise' : Add poison noise to the zipper
+       'region_file': Optional output region file to store the area to be zippered
     """
 
     # Extract kwargs for optional params
     BADPIX_INTERP = kwargs.get('BADPIX_INTERP',None)
-    min_cols   = kwargs.get('DEFAULT_MINCOLS',DEFAULT_MINCOLS)
-    max_cols   = kwargs.get('DEFAULT_MAXCOLS',DEFAULT_MAXCOLS)
-    logger     = kwargs.get('logger',None)
-    xblock     = kwargs.get('xblock',1)
-    yblock     = kwargs.get('yblock',1)
-    ydilate    = kwargs.get('ydilate',0)
-    add_noise  = kwargs.get('add_noise',False)
+    min_cols    = kwargs.get('DEFAULT_MINCOLS',DEFAULT_MINCOLS)
+    max_cols    = kwargs.get('DEFAULT_MAXCOLS',DEFAULT_MAXCOLS)
+    logger      = kwargs.get('logger',None)
+    xblock      = kwargs.get('xblock',1)
+    yblock      = kwargs.get('yblock',1)
+    ydilate     = kwargs.get('ydilate',0)
+    add_noise   = kwargs.get('add_noise',False)
     region_file = kwargs.get('region_file',None) 
 
     if yblock < 0:
@@ -208,6 +210,7 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
         if logger:logger.info(msg)
         else: print "#",msg
 
+    # Print out options that we will use
     msg = 'Zipper interpolation along columns '
     msg = msg + "with xblock=%s, yblock=%s, maxcols=%s, mincols=%s, add_noise=%s, ydilate=%s" % (xblock,yblock, max_cols, min_cols, add_noise,ydilate)
     if logger:logger.info(msg)
@@ -242,7 +245,7 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
     yend   = yend[use]
     xstart = xstart[use]
 
-    # Make a copy of the image that we will modify/interpolate
+    # Make copies of the images that we will modify/interpolate
     image_interp = np.copy(image)
     mask_interp  = np.copy(mask)
     
@@ -271,7 +274,7 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
         # We want to avoid the zero values we encounter in the sapling
         idx  = np.where(im_vals != 0)
         n_good = len(idx[0])
-        if n_good > 3:
+        if n_good > 0:
             mu  = np.median(im_vals[idx])
         else: # Fall back in case they are all zero
             msg = "WARNING: All sampling values equal to zero on slices [%s:%s,%s:%s] and [%s:%s,%s:%s]" % (y1a,y1b,x1,x2, y2a,y2b,x1,x2)
@@ -296,11 +299,9 @@ def zipper_interp_cols(image,mask,interp_mask,**kwargs):
         if BADPIX_INTERP:
             mask_interp[ya:yb,x0] |= BADPIX_INTERP
 
+        # ds9 style region file
         if region_file:
             reg.write("line %s %s %s %s\n" % (x0+1,y1+1,x0+1,y2+1))
-
-
-        
             
     return image_interp,mask_interp
 
