@@ -143,9 +143,16 @@ def DESDM_corners(hdr,border=0):
    #      Corner 1 +-----------------+ Corner 2
    #         (1,1)                     (NAXIS1,1)
    
-   # Short cut for less typing
-   nx = hdr['naxis1']
-   ny = hdr['naxis2']
+   # For fpacked images, NAXIS1/NAXIS2 do not represent the true
+   # dimensions of the image, so we need to use ZNAXIS1/ZNAXIS2
+   # instead when they are present.
+   if hdr.get('znaxis1') and  hdr.get('znaxis2'):
+      print "Will use ZNAXIS1,2"
+      nx = hdr['znaxis1']
+      ny = hdr['znaxis2']
+   else:
+      nx = hdr['naxis1']
+      ny = hdr['naxis2']
    wcs = wcsutil.WCS(hdr)
    rac1,decc1 = wcs.image2sky(1+border, 1+border)
    rac2,decc2 = wcs.image2sky(nx-border,1+border)
