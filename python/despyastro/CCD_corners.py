@@ -147,7 +147,6 @@ def DESDM_corners(hdr,border=0):
    # dimensions of the image, so we need to use ZNAXIS1/ZNAXIS2
    # instead when they are present.
    if hdr.get('znaxis1') and  hdr.get('znaxis2'):
-      print "Will use ZNAXIS1,2"
       nx = hdr['znaxis1']
       ny = hdr['znaxis2']
    else:
