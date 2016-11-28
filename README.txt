@@ -45,3 +45,6 @@ extend of DESDM images
 Minor change to update_DESDM_corners() inside CCD_corners.py to avoid
 crashing in case the corners cannot be computed. Now it simply returns
 the same header that was input.
+
+-- version 0.3.9 (Nov 2016)
+Fixed DESDM_corners() function to use ZNAXIS1/ZNAXIS2 when present for fz files
