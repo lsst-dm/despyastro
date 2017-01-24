@@ -3,6 +3,7 @@ A set of general (for lack of better word) python utilities functions
 that use numpy natively.
 Felipe Menanteau, NCSA Oct 2014
 """
+import collections
 
 def query2dict_of_columns(query,dbhandle,array=False):
 
@@ -21,7 +22,7 @@ def query2dict_of_columns(query,dbhandle,array=False):
     # Get the description of the columns to make the dictionary
     desc = [d[0] for d in cur.description] 
 
-    querydic = {} # We will populate this one
+    querydic = collections.OrderedDict() # We will populate this one
     cols = zip(*list_of_tuples)
     for k in range(len(cols)):
         key = desc[k]
