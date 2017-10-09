@@ -6,6 +6,11 @@ A collection of astro-related Python functions useful for DESDM Python-based
 modules. This modules has evolved from the orginal despyutils that was growing
 to be too large and have too many dependencies. 
 
+.. warning::
+
+   The package is a prototype and as such is subject to change and does not
+   meet LSST coding standards.
+
 ****
 
 This code is part of the Dark Energy Survey (DES) Data Management System
