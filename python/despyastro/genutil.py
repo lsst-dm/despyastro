@@ -22,7 +22,7 @@ def query2dict_of_columns(query, dbhandle, array=False):
     desc = [d[0] for d in cur.description]
 
     querydic = collections.OrderedDict() # We will populate this one
-    cols = zip(*list_of_tuples)
+    cols = list(zip(*list_of_tuples))
     for k in range(len(cols)):
         key = desc[k]
         if array:
@@ -51,5 +51,5 @@ def query2rec(query, dbhandle, verb=False):
         return numpy.rec.array(tuples, names=names)
     else:
         if verb:
-            print "# WARNING DB Query in query2rec() returned no results"
+            print("# WARNING DB Query in query2rec() returned no results")
         return False

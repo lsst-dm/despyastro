@@ -31,9 +31,9 @@ def put_header(file, text):
     """
     if len(text) == 0:
         return
-    if text[0] <> '#':
+    if text[0] != '#':
         text = '#'+text
-    if text[-1] <> '\n':
+    if text[-1] != '\n':
         text = text+'\n'
     buffer = text+open(file).read()
     open(file, 'w').write(buffer)
@@ -61,7 +61,7 @@ def get_str(file, cols=0, nrows='all', sep=None):
     for i in range(nvar):
         lista.append([])
 
-    if type(file) is types.ListType:
+    if type(file) is list:
         buffer = file
         #print "# Passing a buffer"
     else:
@@ -97,14 +97,14 @@ def put_str(file, tupla):
     Usage:
         put_str(file,(x,y,z))
     """
-    if type(tupla) <> type((2,)):
-        raise 'Need a tuple of variables'
+    if type(tupla) != type((2,)):
+        raise ValueError('Need a tuple of variables.')
 
     f = open(file, 'w')
 
     for i in range(1, len(tupla)):
-        if len(tupla[i]) <> len(tupla[0]):
-            raise 'Variable lists have different length'
+        if len(tupla[i]) != len(tupla[0]):
+            raise ValueError('Variable lists have different length.')
     for i in range(len(tupla[0])):
         cosas = []
         for j in range(len(tupla)):
@@ -128,11 +128,11 @@ def get_data(file, cols=0, nrows='all', sep=None):
     data = get_str(file, cols, nrows, sep=sep)
 
     if nvar == 1:
-        return numpy.array(map(float, data))
+        return numpy.array(list(map(float, data)))
     else:
         data = list(data)
         for j in range(nvar):
-            data[j] = numpy.array(map(float, data[j]))
+            data[j] = numpy.array(list(map(float, data[j])))
         return tuple(data)
 
 
@@ -145,18 +145,18 @@ def put_data(file, variables, header='', format='', append='no'):
     where header is any string  and format is a string of the type:
     '%f %f %i'.
     """
-    if type(variables) <> type((2,)):
-        raise 'Need a tuple of variables'
+    if type(variables) != type((2,)):
+        raise ValueError('Need a tuple of variables.')
     if format == '':
         format = '%.8e  '*len(variables)
     if append == 'yes':
         f = open(file, 'a')
     else:
         f = open(file, 'w')
-    if header <> "":
-        if header[0] <> '#':
+    if header != "":
+        if header[0] != '#':
             header = '#'+header
-        if header[-1] <> '\n':
+        if header[-1] != '\n':
             header = header+'\n'
         f.write(header)
     for i in range(len(variables[0])):
@@ -187,12 +187,12 @@ def rcols(file, cols=None, nrows='all'):
     data = get_string(file, cols, nrows)
 
     if nvar == 1:
-        return numpy.array(map(float, data))
+        return numpy.array(list(map(float, data)))
     else:
         data = list(data)
         nvar = len(data)
         for j in range(nvar):
-            data[j] = numpy.array(map(float, data[j]))
+            data[j] = numpy.array(list(map(float, data[j])))
         return tuple(data)
 
 
@@ -266,11 +266,11 @@ def get_datarray(file, cols=0, nrows='all', buffer=None):
     data = get_string(file, cols, nrows, buffer)
 
     if nvar == 1:
-        return numpy.array(map(float, data))
+        return numpy.array(list(map(float, data)))
     else:
         data = list(data)
         for j in range(nvar):
-            data[j] = numpy.array(map(float, data[j]))
+            data[j] = numpy.array(list(map(float, data[j])))
         return tuple(data)
 
 
@@ -295,9 +295,9 @@ def get_2Darray(file, cols='all', nrows='all', verbose='no'):
             if line[0] == '#':
                 continue
             nc = len(pieces)
-            cols = range(nc)
+            cols = list(range(nc))
             if verbose == 'yes':
-                print 'cols=', cols
+                print('cols=', cols)
             break
     else:
         nc = len(cols)

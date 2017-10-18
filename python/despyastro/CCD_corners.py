@@ -11,7 +11,7 @@ def update_DESDM_corners(hdr, border=0, get_extent=False, verb=False, logger=Non
     if logger:
         logger.info(mess)
     elif verb:
-        print mess
+        print(mess)
 
     # Get the values
     try:
@@ -21,7 +21,7 @@ def update_DESDM_corners(hdr, border=0, get_extent=False, verb=False, logger=Non
         if logger:
             logger.info(mess)
         else:
-            print mess
+            print(mess)
         return hdr
 
     # Build a list  of records in format accepted by fitsio
@@ -47,10 +47,10 @@ def update_DESDM_corners(hdr, border=0, get_extent=False, verb=False, logger=Non
             RACMIN, RACMAX, DECCMIN, DECCMAX, CROSSRA0 = get_DESDM_corners_extent(ras, decs)
         except:
             mess = "WARNING: Problem computing the get_DESDM_corners_extent(), will return unchanged header"
-            if loggger:
+            if logger:
                 logger.info(mess)
             else:
-                print mess
+                print(mess)
             return hdr
 
         reclist = reclist + [
@@ -65,14 +65,14 @@ def update_DESDM_corners(hdr, border=0, get_extent=False, verb=False, logger=Non
     [hdr.add_record(rec) for rec in reclist]
 
     if verb:
-        print " RA_CEN,DEC_CEN = {:12.7f},{:12.7f} ".format(hdr['RA_CENT'], hdr['DEC_CENT'])
-        print "     RAC1,DECC1 = {:12.7f},{:12.7f} ".format(hdr['RAC1'], hdr['DECC1'])
-        print "     RAC2,DECC2 = {:12.7f},{:12.7f} ".format(hdr['RAC2'], hdr['DECC2'])
-        print "     RAC3,DECC3 = {:12.7f},{:12.7f} ".format(hdr['RAC3'], hdr['DECC3'])
-        print "     RAC4,DECC4 = {:12.7f},{:12.7f} ".format(hdr['RAC4'], hdr['DECC4'])
-        print "  RACMIN,RACMAX = {:12.7f},{:12.7f} ".format(hdr['RACMIN'], hdr['RACMAX'])
-        print "DECCMIN,DECCMAX = {:12.7f},{:12.7f} ".format(hdr['DECCMIN'], hdr['DECCMAX'])
-        print "       CROSSRA0 = {:s} ".format(hdr['CROSSRA0'])
+        print(" RA_CEN,DEC_CEN = {:12.7f},{:12.7f} ".format(hdr['RA_CENT'], hdr['DEC_CENT']))
+        print("     RAC1,DECC1 = {:12.7f},{:12.7f} ".format(hdr['RAC1'], hdr['DECC1']))
+        print("     RAC2,DECC2 = {:12.7f},{:12.7f} ".format(hdr['RAC2'], hdr['DECC2']))
+        print("     RAC3,DECC3 = {:12.7f},{:12.7f} ".format(hdr['RAC3'], hdr['DECC3']))
+        print("     RAC4,DECC4 = {:12.7f},{:12.7f} ".format(hdr['RAC4'], hdr['DECC4']))
+        print("  RACMIN,RACMAX = {:12.7f},{:12.7f} ".format(hdr['RACMIN'], hdr['RACMAX']))
+        print("DECCMIN,DECCMAX = {:12.7f},{:12.7f} ".format(hdr['DECCMIN'], hdr['DECCMAX']))
+        print("       CROSSRA0 = {:s} ".format(hdr['CROSSRA0']))
 
     return hdr
 

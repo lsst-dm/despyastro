@@ -63,7 +63,7 @@ def zipper_interp_rows(image, mask, interp_mask, **kwargs):
     if logger:
         logger.info(msg)
     else:
-        print "#", msg
+        print("#", msg)
 
     # Find the pixels to work with
     interpolate = np.array(mask & interp_mask, dtype=bool)
@@ -81,8 +81,8 @@ def zipper_interp_rows(image, mask, interp_mask, **kwargs):
 
     # If we've done this correctly, every run has a start and an end.
     if not np.all(ystart == yend):
-        print "Logic problem, ystart and yend not equal."
-        print ystart, yend ###
+        print("Logic problem, ystart and yend not equal.")
+        print(ystart, yend) ###
         return 1
 
     # Narrow our list to runs of the desired length range
@@ -203,7 +203,7 @@ def zipper_interp_cols(image, mask, interp_mask, **kwargs):
         if logger:
             logger.info(msg)
         else:
-            print "#", msg
+            print("#", msg)
 
     if region_file:
         msg = "Will write ds9 regions to %s" % region_file
@@ -211,7 +211,7 @@ def zipper_interp_cols(image, mask, interp_mask, **kwargs):
         if logger:
             logger.info(msg)
         else:
-            print "#", msg
+            print("#", msg)
 
     # Print out options that we will use
     msg = 'Zipper interpolation along columns '
@@ -220,7 +220,7 @@ def zipper_interp_cols(image, mask, interp_mask, **kwargs):
     if logger:
         logger.info(msg)
     else:
-        print "#", msg
+        print("#", msg)
 
     # Find the pixels to work with
     interpolate = np.array(mask & interp_mask, dtype=bool)
@@ -237,8 +237,8 @@ def zipper_interp_cols(image, mask, interp_mask, **kwargs):
 
     # If we've done this correctly, every run has a start and an end, on same col
     if not np.all(xstart == xend):
-        print "Logic problem, xstart and xend not equal."
-        print xstart, xend ###
+        print("Logic problem, xstart and xend not equal.")
+        print(xstart, xend) ###
         return 1
 
     # Narrow our list to runs of the desired length
@@ -288,7 +288,7 @@ def zipper_interp_cols(image, mask, interp_mask, **kwargs):
             if logger:
                 logger.info(msg)
             else:
-                print "#", msg
+                print("#", msg)
             mu = im_vals.mean()
 
         # y-dilate

@@ -211,7 +211,7 @@ class WCS(object):
         self.wcs[key] = val
 
     def keys(self):
-        return self.wcs.keys()
+        return list(self.wcs.keys())
 
     def image2sky(self, x, y, distort=True):
         """Convert between image x,y and sky coordinates lon,lat e.g. ra,dec.
@@ -828,7 +828,7 @@ class WCS(object):
             # Try to use the items() method to get what we want
             wcs = {}
             try:
-                for k, v in wcs_in.items():
+                for k, v in list(wcs_in.items()):
                     wcs[k.lower()] = v
             except:
                 raise ValueError('Input wcs must be a numpy array ' +
