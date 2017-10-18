@@ -1,13 +1,11 @@
-"""
-A set of general (for lack of better word) python utilities functions
-that use numpy natively.
-Felipe Menanteau, NCSA Oct 2014
+"""A set of general  python utilities functions that use numpy natively.
 """
 import collections
 
 
 def query2dict_of_columns(query, dbhandle, array=False):
-    """
+    """Transforms the result of an SQL query and a Database handle.
+
     Transforms the result of an SQL query and a Database handle object [dhandle]
     into a dictionary of list or numpy arrays if array=True
     """
@@ -38,10 +36,8 @@ def query2dict_of_columns(query, dbhandle, array=False):
 
 
 def query2rec(query, dbhandle, verb=False):
+    """Queries DB and returns results as a numpy recarray.
     """
-    Queries DB and returns results as a numpy recarray.
-    """
-
     import numpy
     # Get the cursor from the DB handle
     cur = dbhandle.cursor()

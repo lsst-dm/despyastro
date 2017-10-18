@@ -1,8 +1,8 @@
 """
 
- Taken from Erin Sheldon's esutil package at:
- http://esutil.googlecode.com/svn/trunk/esutil/coords.py
- Felipe Menanteau, NCSA, March 2014.
+Taken from Erin Sheldon's esutil package at:
+http://esutil.googlecode.com/svn/trunk/esutil/coords.py
+Felipe Menanteau, NCSA, March 2014.
 
     NAME
         coords
@@ -78,9 +78,8 @@
 
         rect_area(lon_min, lon_max, lat_min, lat_max)
             Calculate the area of a rectangle on the sphere.
-
-
 """
+
 license = """
   Copyright (C) 2009  Erin Sheldon
 

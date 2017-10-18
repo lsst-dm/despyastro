@@ -1,28 +1,21 @@
-"""
+"""A collection of useful functions in astrometry.
 
-A collection of useful functions in astrometry. The functions ported
-here correspond to a subset of inhereted from Felipe Menanteau's
-astrometry.py old library. Removed all wcs/header transformations as
-this are better handled by Erin Sheldon wcsutil
+The functions ported here correspond to a subset of inhereted from Felipe
+Menanteau's astrometry.py old library. Removed all wcs/header
+transformations as this are better handled by Erin Sheldon wcsutil
 
 The functions will:
-     - format decimal <---> DDMMSS/HHMMMSS
-     - greater circle distance(ra,dec)
-     - area in polygon
-
- Requires:
-     numpy
-
- Felipe Menanteau, Apr/Oct 2014
- 
+- format decimal <---> DDMMSS/HHMMMSS
+- greater circle distance(ra,dec)
+- area in polygon
 """
 
 
 def circle_distance(ra1, dec1, ra2, dec2, units='deg'):
-    """
-    Calculates great-circle distances between the two points that is,
-    the shortest distance over the earth's surface using the Haversine
-    formula, see http://www.movable-type.co.uk/scripts/latlong.html
+    """Calculates great-circle distances between the two points.
+
+    It is, the shortest distance over the earth's surface using the
+    Haversine formula, see http://www.movable-type.co.uk/scripts/latlong.html
     """
     import numpy
     from math import pi
@@ -48,8 +41,7 @@ def circle_distance(ra1, dec1, ra2, dec2, units='deg'):
 
 
 def deg2dec(deg, sep=":"):
-    """
-    Degrees to decimal, one element or list/array object.
+    """Degrees to decimal, one element or list/array object.
     """
     if hasattr(deg, '__iter__'):
         return [deg2dec_one(d, sep=sep) for d in deg]
@@ -59,8 +51,8 @@ def deg2dec(deg, sep=":"):
 
 
 def deg2dec_one(deg, sep=":"):
-    """
-    Degrees to decimal, one element only.
+    """Degrees to decimal, one element only.
+
     It should be generalized to an array or list of string.
     """
     vals = deg.split(sep)
@@ -74,10 +66,8 @@ def deg2dec_one(deg, sep=":"):
 
 
 def dec2deg(dec, sep=":", plussign=False, short=False, sectol=1e-3):
+    """From decimal to degress, array or scalar.
     """
-    From decimal to degress, array or scalar
-    """
-
     import numpy
     import sys
     import math
@@ -146,7 +136,8 @@ def format_deg(x, short=False, sep=":", plussign=False):
 
 
 def sky_area(ra, dec, units='degrees'):
-    """
+    """Calculate skye area.
+
     Based on: 'Computing the Area of a Spherical Polygon" by Robert D. Miller
     in "Graphics Gems IV', Academic Press, 1994
 
@@ -158,7 +149,6 @@ def sky_area(ra, dec, units='degrees'):
 
     Doesn't work well on wide range of RA's
     """
-
     import math
     import numpy
 
@@ -193,8 +183,7 @@ def sky_area(ra, dec, units='degrees'):
 
 
 def get_pixelscale(header, units='arcsec'):
-    """
-    Returns the pixel-scale from the CDX_X matrix in an WCS-compiant header
+    """Returns the pixel-scale from the CDX_X matrix in an WCS-compiant header.
     """
     import math
     if units == 'arcsec':
@@ -214,10 +203,11 @@ def get_pixelscale(header, units='arcsec'):
 
 
 def update_wcs_matrix(header, x0, y0, naxis1, naxis2):
-    """
-    Update the wcs header object with the right CRPIX[1,2] CRVAL[1,2] for a given subsection
-    """
+    """Update the WCS header.
 
+    Update the wcs header object with the right CRPIX[1,2] CRVAL[1,2] for a
+    given subsection.
+    """
     import copy
     from despyastro import wcsutil
 

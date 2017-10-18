@@ -1,6 +1,5 @@
 """
 
-
  Taken from Erin Sheldon's esutil package at:
  http://esutil.googlecode.com/svn/trunk/esutil/wcsutil.py
  Felipe Menanteau, NCSA, March 2014.
@@ -135,9 +134,9 @@ for key in smkeys:
 
 
 class WCS(object):
-    """
-    A class to do WCS transformations.  Currently supports TAN projections
-    for 
+    """A class to do WCS transformations.
+
+    Currently supports TAN projections for
 
         RA--TPV, DEC-TPV
         RA---TAN and DEC--TAN
@@ -185,7 +184,6 @@ class WCS(object):
         # inverse polynomial.
 
         x,y = wcs.sky2image(ra,dec)
-
     """
 
     def __init__(self, wcs, longpole=180.0, latpole=90.0, theta0=90.0):
@@ -216,30 +214,28 @@ class WCS(object):
         return self.wcs.keys()
 
     def image2sky(self, x, y, distort=True):
-        """
-        Convert between image x,y and sky coordinates lon,lat e.g. ra,dec.
+        """Convert between image x,y and sky coordinates lon,lat e.g. ra,dec.
 
-        parameters
+        Parameters
         ----------
-        x,y: scalars or arrays
-            x and y coords in the image
-        distort:  bool, optional
-            Use the distortion model if present.  Default is True
+        x, y : scalars or arrays
+            x and y coords in the image.
+        distort :  bool, optional
+            Use the distortion model if present.  Default is True.
 
-        returned values
-        ---------------
-        longitude,latitude:  tupple of arrays
-            Probably ra,dec.  Will have the same shape as x,y
+        Returns
+        -------
+        longitude, latitude : tupple of arrays
+            Probably ra, dec.  Will have the same shape as x, y.
 
-        examples
+        Examples
         --------
-        import wcsutil
-        import fitsio
-        hdr=fitsio.read_header(fname)
-        wcs = wcsutil.WCS(hdr)
-        ra,dec = wcs.image2sky(x,y)
+        >>> import wcsutil
+        >>> import fitsio
+        >>> hdr = fitsio.read_header(fname)
+        >>> wcs = wcsutil.WCS(hdr)
+        >>> ra, dec = wcs.image2sky(x,y)
         """
-
         arescalar = isscalar(x)
         x = numpy.array(x, dtype='f8', copy=False)
         y = numpy.array(y, dtype='f8', copy=False)
@@ -350,13 +346,11 @@ class WCS(object):
         return xp, yp
 
     def image2sph(self, xin, yin):
-        """
-        Convert x,y projected coordinates to spherical coordinates
-        Currently only supports tangent plane projections.
-        The conventions assumed are that of the WCS
-        Works in the native system currently
-        """
+        """Convert x,y projected coordinates to spherical coordinates.
 
+        Currently only supports tangent plane projections. The conventions
+        assumed are that of the WCS Works in the native system currently.
+        """
         # Make sure ndmin=1 to avoid messed up scalar arrays
         x = numpy.array(xin, ndmin=1, dtype='f8')
         y = numpy.array(yin, ndmin=1, dtype='f8')
@@ -395,7 +389,8 @@ class WCS(object):
 
     def sph2image(self, longitude_in, latitude_in):
         """
-        Must be a tangent plane projection
+
+        Must be a tangent plane projection.
         """
         longitude = numpy.array(longitude_in, ndmin=1, dtype='f8')
         latitude = numpy.array(latitude_in, ndmin=1, dtype='f8')
@@ -458,9 +453,9 @@ class WCS(object):
         return r
 
     def _rotate(self, longitude, latitude, r):
-        """
-        Apply a rotation matrix to the input longitude and latitude
-        inputs must be numpy arrays
+        """Apply a rotation matrix to the input longitude and latitude.
+
+        Inputs must be numpy arrays.
         """
         l = numpy.cos(latitude)*numpy.cos(longitude)
         m = numpy.cos(latitude)*numpy.sin(longitude)
@@ -495,14 +490,14 @@ class WCS(object):
         return diff
 
     def _findxy(self, lon, lat):
-        """ 
+        """
+
         This is the simplest way to do the inverse of the (x,y)->(lon,lat)
         transformation when there are distortions.  Simply find the x,y 
         that give the input lon,lat from the actual distortion function.  
 
         Uses scipy.optimize.fsolve to find the roots of the transformation
         """
-
         import scipy.optimize
         #lon = numpy.array(lonin, ndmin=1, dtype='f8', copy=False)
         #lat = numpy.array(latin, ndmin=1, dtype='f8', copy=False)
@@ -527,15 +522,14 @@ class WCS(object):
         return x, y
 
     def Distort(self, xin, yin, inverse=False):
-        """
-        Apply a distortion map to the data.  This follows the SIP convention, 
-        but if the scamp PV coefficients were found by the ConvertWCS code 
-        they are converted to the SIP convention.  The only difference is 
-        the order of operations:  for image to sky PV distortions come after 
-        the application of the CD matrix as opposed to SIP.  
+        """Apply a distortion map to the data.
 
+        This follows the SIP convention, but if the scamp PV coefficients
+        were found by the ConvertWCS code they are converted to the SIP
+        convention.  The only difference is the order of operations:  for
+        image to sky PV distortions come after the application of the CD
+        matrix as opposed to SIP.
         """
-
         x = numpy.array(xin, ndmin=1, dtype='f8')
         y = numpy.array(yin, ndmin=1, dtype='f8')
         # Sometimes there is no distortion model present
@@ -604,10 +598,10 @@ class WCS(object):
 
     def InvertPVDistortion(self, fac=5, order_increase=1,
                            verbose=False, doplot=False):
-        """
-        Invert the distortion model.  Must contain a,b matrices
-        """
+        """Invert the distortion model.
 
+        Must contain a, b matrices.
+        """
         wcs = self.wcs
         self.naxis = numpy.array([wcs['naxis1'],
                                   wcs['naxis2']])
@@ -668,10 +662,10 @@ class WCS(object):
 
     def InvertSipDistortion(self, fac=5,
                             verbose=False, doplot=False, order_increase=1):
-        """
-        Invert the distortion model.  Must contain a,b matrices
-        """
+        """Invert the distortion model.
 
+        Must contain a,b matrices.
+        """
         self.naxis = numpy.array([wcs['naxis1'],
                                   wcs['naxis2']])
 
@@ -799,10 +793,8 @@ class WCS(object):
         return longitude_p, latitude_p
 
     def ConvertWCS(self, wcs_in):
+        """Convert to a dictionary.
         """
-        Convert to a dictionary
-        """
-
         self.wcs = None
         self.distort = {'name': 'none'}
         self.cd = None
@@ -1132,10 +1124,8 @@ def invert_for_coeffs(amatrix, x, y, lsolve=True):
 
 
 def pack_coeffs(xcoeffs, ycoeffs, porder, constant=True):
+    """Pack coeffs into a matrix form.
     """
-    pack coeffs into a matrix form
-    """
-
     if constant:
         ostart = 0
     else:

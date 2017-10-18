@@ -78,11 +78,10 @@ def update_DESDM_corners(hdr, border=0, get_extent=False, verb=False, logger=Non
 
 
 def get_DESDM_corners_extent(ras, decs):
-    """
-    Additional quantities for future COADD queries
+    """Additional quantities for future COADD queries.
+
     Some may not yet be supported in DB.
     """
-
     # Make sure that they are numpy objetcs
     ras = numpy.array(ras)
     decs = numpy.array(decs)

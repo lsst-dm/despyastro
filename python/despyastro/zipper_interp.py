@@ -7,8 +7,7 @@ DEFAULT_MAXCOLS = None  # Widest feature to interpolate.  None means no limit.
 
 
 def zipper_interp(image, mask, interp_mask, axis=1, **kwargs):
-    """
-    Calls either zipper_interp_rows (axis=1) or zipper_interp_cols (axis=2)
+    """Calls either zipper_interp_rows (axis=1) or zipper_interp_cols (axis=2).
     """
     if axis == 1:
         return zipper_interp_rows(image, mask, interp_mask, **kwargs)
@@ -19,16 +18,16 @@ def zipper_interp(image, mask, interp_mask, axis=1, **kwargs):
 
 
 def zipper_interp_rows(image, mask, interp_mask, **kwargs):
-    """
-    Performs zipper row interpolation.
-    Based on Gary Berstein's row_interp.py inside pixcorrect
+    """Performs zipper row interpolation.
 
-    Interpolate over selected pixels by inserting average/median of
-    pixels to left and right of any bunch of adjacent selected pixels.
-    If the interpolation region touches an edge, or the adjacent pixel
-    has flags marking it as invalid, than the value at other border is
-    used for interpolation.  No interpolation is done if both boundary
-    pixels are invalid.
+    Based on Gary Berstein's row_interp.py inside pixcorrect.
+
+    Interpolate over selected pixels by inserting average/median of pixels
+    to left and right of any bunch of adjacent selected pixels. If the
+    interpolation region touches an edge, or the adjacent pixel has flags
+    marking it as invalid, than the value at other border is used for
+    interpolation.  No interpolation is done if both boundary pixels are
+    invalid.
 
     :Postional parameters:
        'image': the 2D numpy array input image
@@ -50,7 +49,6 @@ def zipper_interp_rows(image, mask, interp_mask, **kwargs):
        'ydiltate' : number of pixels to dilate in the y-axis
        'add_noise' : Add poison noise to the zipper
     """
-
     # Extract kwargs for optional params
     BADPIX_INTERP = kwargs.get('BADPIX_INTERP', None)
     invalid_mask = kwargs.get('invalid_mask', 0)
@@ -156,8 +154,8 @@ def zipper_interp_rows(image, mask, interp_mask, **kwargs):
 
 
 def zipper_interp_cols(image, mask, interp_mask, **kwargs):
-    """
-    Performs zipper column interpolation.
+    """Performs zipper column interpolation.
+
     Based on Gary Berstein's coadd-prepare script.
 
     Interpolate over selected pixels by inserting average/median of
@@ -188,7 +186,6 @@ def zipper_interp_cols(image, mask, interp_mask, **kwargs):
        'add_noise' : Add poison noise to the zipper
        'region_file': Optional output region file to store the area to be zippered
     """
-
     # Extract kwargs for optional params
     BADPIX_INTERP = kwargs.get('BADPIX_INTERP', None)
     min_cols = kwargs.get('DEFAULT_MINCOLS', DEFAULT_MINCOLS)
