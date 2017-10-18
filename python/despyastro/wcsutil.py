@@ -1,10 +1,5 @@
 """
 
- $Id:$
- $Rev::                                  $:  # Revision of last commit.
- $LastChangedBy::                        $:  # Author of last commit.
- $LastChangedDate::                      $:  # Date of last commit.
-
 
  Taken from Erin Sheldon's esutil package at:
  http://esutil.googlecode.com/svn/trunk/esutil/wcsutil.py
