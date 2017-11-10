@@ -10,5 +10,6 @@ setup(name='despyastro',
       author_email = "felipe@illinois.edu",
       packages = ['despyastro'],
       package_dir = {'': 'python'},
+      data_files=[('ups',['ups/despyastro.table'])],
       )
 
