@@ -2,8 +2,6 @@
 """
 
 __author__ = "Felipe Menanteau"
-__version__ = '0.3.9'
-version = __version__
 
 from . import astrometry
 from . import coords

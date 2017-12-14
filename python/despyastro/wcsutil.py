@@ -1,5 +1,4 @@
 """
-
  Taken from Erin Sheldon's esutil package at:
  http://esutil.googlecode.com/svn/trunk/esutil/wcsutil.py
  Felipe Menanteau, NCSA, March 2014.
