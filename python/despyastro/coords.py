@@ -1,7 +1,7 @@
 """
- Taken from Erin Sheldon's esutil package at:
- http://esutil.googlecode.com/svn/trunk/esutil/coords.py
- Felipe Menanteau, NCSA, March 2014.
+Taken from Erin Sheldon's esutil package at:
+http://esutil.googlecode.com/svn/trunk/esutil/coords.py
+Felipe Menanteau, NCSA, March 2014.
 
     NAME
         coords
@@ -77,10 +77,9 @@
 
         rect_area(lon_min, lon_max, lat_min, lat_max)
             Calculate the area of a rectangle on the sphere.
-
-
 """
-license="""
+
+license = """
   Copyright (C) 2009  Erin Sheldon
 
     This program is free software; you can redistribute it and/or modify it
@@ -101,12 +100,12 @@ license="""
 try:
     import numpy
     from numpy import where, sin, cos, arccos, arcsin, arctan2, sqrt, rad2deg, deg2rad
-    have_numpy=True
+    have_numpy = True
 except:
-    have_numpy=False
+    have_numpy = False
 
 import math
-PI=math.pi
+PI = math.pi
 HALFPI = PI/2.0
 D2R = PI/180.0
 R2D = 1.0/D2R
@@ -183,72 +182,71 @@ def euler(ai_in, bi_in, select, b1950=False, dtype='f8'):
     ai = numpy.array(ai_in, ndmin=1, copy=True, dtype=dtype)
     bi = numpy.array(bi_in, ndmin=1, copy=True, dtype=dtype)
 
-    twopi   =   2.0*PI
-    fourpi  =   4.0*PI
+    twopi = 2.0*PI
+    fourpi = 4.0*PI
 
     #   J2000 coordinate conversions are based on the following constants
     #   (see the Hipparcos explanatory supplement).
     #  eps = 23.4392911111d           Obliquity of the ecliptic
     #  alphaG = 192.85948d            Right Ascension of Galactic North Pole
     #  deltaG = 27.12825d             Declination of Galactic North Pole
-    #  lomega = 32.93192d             Galactic longitude of celestial equator  
+    #  lomega = 32.93192d             Galactic longitude of celestial equator
     #  alphaE = 180.02322d            Ecliptic longitude of Galactic North Pole
     #  deltaE = 29.811438523d         Ecliptic latitude of Galactic North Pole
-    #  Eomega  = 6.3839743d           Galactic longitude of ecliptic equator              
+    #  Eomega  = 6.3839743d           Galactic longitude of ecliptic equator
     # Parameters for all the different conversions
     if b1950:
 
-        equinox = '(B1950)' 
-        psi    = numpy.array([ 0.57595865315, 4.9261918136,  
-                              0.00000000000, 0.0000000000,  
-                              0.11129056012, 4.7005372834], dtype=dtype)
-        stheta = numpy.array([ 0.88781538514,-0.88781538514, 
-                              0.39788119938,-0.39788119938, 
-                              0.86766174755,-0.86766174755], dtype=dtype)
-        ctheta = numpy.array([ 0.46019978478, 0.46019978478, 
-                              0.91743694670, 0.91743694670, 
-                              0.49715499774, 0.49715499774], dtype=dtype) 
-        phi  =   numpy.array([ 4.9261918136,  0.57595865315, 
-                              0.0000000000, 0.00000000000, 
-                              4.7005372834, 0.11129056012], dtype=dtype)
+        equinox = '(B1950)'
+        psi = numpy.array([0.57595865315, 4.9261918136,
+                           0.00000000000, 0.0000000000,
+                           0.11129056012, 4.7005372834], dtype=dtype)
+        stheta = numpy.array([0.88781538514, -0.88781538514,
+                              0.39788119938, -0.39788119938,
+                              0.86766174755, -0.86766174755], dtype=dtype)
+        ctheta = numpy.array([0.46019978478, 0.46019978478,
+                              0.91743694670, 0.91743694670,
+                              0.49715499774, 0.49715499774], dtype=dtype)
+        phi = numpy.array([4.9261918136, 0.57595865315,
+                           0.0000000000, 0.00000000000,
+                           4.7005372834, 0.11129056012], dtype=dtype)
 
     else:
 
         equinox = '(J2000)'
 
-        psi    = numpy.array([ 0.57477043300, 4.9368292465,  
-                              0.00000000000, 0.0000000000,    
-                              0.11142137093, 4.71279419371], dtype=dtype)
-        stheta = numpy.array([ 0.88998808748,-0.88998808748, 
-                              0.39777715593,-0.39777715593, 
-                              0.86766622025,-0.86766622025], dtype=dtype)
-        ctheta = numpy.array([ 0.45598377618, 0.45598377618, 
-                              0.91748206207, 0.91748206207, 
+        psi = numpy.array([0.57477043300, 4.9368292465,
+                           0.00000000000, 0.0000000000,
+                           0.11142137093, 4.71279419371], dtype=dtype)
+        stheta = numpy.array([0.88998808748, -0.88998808748,
+                              0.39777715593, -0.39777715593,
+                              0.86766622025, -0.86766622025], dtype=dtype)
+        ctheta = numpy.array([0.45598377618, 0.45598377618,
+                              0.91748206207, 0.91748206207,
                               0.49714719172, 0.49714719172], dtype=dtype)
-        phi    = numpy.array([ 4.9368292465,  0.57477043300, 
-                              0.0000000000, 0.00000000000, 
-                              4.71279419371, 0.11142137093], dtype=dtype)
+        phi = numpy.array([4.9368292465, 0.57477043300,
+                           0.0000000000, 0.00000000000,
+                           4.71279419371, 0.11142137093], dtype=dtype)
 
     # zero offset
-    i  = select - 1 
-    a  = ai*D2R - phi[i]
-    
+    i = select - 1
+    a = ai*D2R - phi[i]
+
     b = bi*D2R
     sb = sin(b)
     cb = cos(b)
     cbsa = cb * sin(a)
-    b  = -stheta[i] * cbsa + ctheta[i] * sb
+    b = -stheta[i] * cbsa + ctheta[i] * sb
     w, = numpy.where(b > 1.0)
     if w.size > 0:
         b[w] = 1.0
-    bo    = arcsin(b)*R2D
+    bo = arcsin(b)*R2D
 
-    a =  arctan2( ctheta[i] * cbsa + stheta[i] * sb, cb * cos(a) )
+    a = arctan2(ctheta[i] * cbsa + stheta[i] * sb, cb * cos(a))
 
-    ao = ( (a+psi[i]+fourpi) % twopi) * R2D
+    ao = ((a+psi[i]+fourpi) % twopi) * R2D
 
     return ao, bo
-
 
 
 #
@@ -302,6 +300,7 @@ def gal2eq(l, b, b1950=False, dtype='f8'):
 
     return euler(l, b, 2, b1950=b1950, dtype=dtype)
 
+
 def eq2ec(ra, dec, b1950=False, dtype='f8'):
     """
     NAME
@@ -325,6 +324,7 @@ def eq2ec(ra, dec, b1950=False, dtype='f8'):
     """
 
     return euler(ra, dec, 3, b1950=b1950, dtype=dtype)
+
 
 def ec2eq(lam, beta, b1950=False, dtype='f8'):
     """
@@ -350,6 +350,7 @@ def ec2eq(lam, beta, b1950=False, dtype='f8'):
 
     return euler(lam, beta, 4, b1950=b1950, dtype=dtype)
 
+
 def ec2gal(lam, beta, b1950=False, dtype='f8'):
     """
     NAME
@@ -373,6 +374,7 @@ def ec2gal(lam, beta, b1950=False, dtype='f8'):
     """
 
     return euler(lam, beta, 5, b1950=b1950, dtype=dtype)
+
 
 def gal2ec(l, b, b1950=False, dtype='f8'):
     """
@@ -407,16 +409,18 @@ def _thetaphi2xyz(theta, phi):
     y = sin(theta)*cos(phi)
     z = sin(phi)
 
-    return x,y,z
+    return x, y, z
 
-def _xyz2thetaphi(x,y,z):
+
+def _xyz2thetaphi(x, y, z):
     """
     returns theta, phi in radians relative to the SDSS node at ra=95 degrees
     """
     phi = arcsin(z)
-    theta = arctan2(y,x)
+    theta = arctan2(y, x)
 
     return theta, phi
+
 
 def eq2xyz(ra, dec, dtype='f8', units='deg'):
     """
@@ -441,14 +445,15 @@ def eq2xyz(ra, dec, dtype='f8', units='deg'):
 
     # in place is more efficient
     if units == 'deg':
-        numpy.deg2rad(theta,theta)
-        numpy.deg2rad(phi,phi)
+        numpy.deg2rad(theta, theta)
+        numpy.deg2rad(phi, phi)
 
     theta -= _sdsspar['node']
 
     return _thetaphi2xyz(theta, phi)
 
-def xyz2eq(xin,yin,zin, units='deg'):
+
+def xyz2eq(xin, yin, zin, units='deg'):
     """
     Convert x,y,z on the unit sphere to RA DEC.
 
@@ -468,21 +473,20 @@ def xyz2eq(xin,yin,zin, units='deg'):
     y = numpy.array(yin, ndmin=1, copy=False)
     z = numpy.array(zin, ndmin=1, copy=False)
 
-    theta,phi = _xyz2thetaphi(x,y,z)
+    theta, phi = _xyz2thetaphi(x, y, z)
     theta += _sdsspar['node']
 
     if units == 'deg':
-        numpy.rad2deg(theta,theta)
-        numpy.rad2deg(phi,phi)
+        numpy.rad2deg(theta, theta)
+        numpy.rad2deg(phi, phi)
 
     atbound(theta, 0.0, 360.0)
 
     # theta->ra, phi->dec
-    return theta,phi
+    return theta, phi
 
-   
 
-def sphdist(ra1, dec1, ra2, dec2, units=['deg','deg']):
+def sphdist(ra1, dec1, ra2, dec2, units=['deg', 'deg']):
     """
     Get the arc length between two points on the unit sphere
 
@@ -496,36 +500,36 @@ def sphdist(ra1, dec1, ra2, dec2, units=['deg','deg']):
         ['deg',deg'], which means inputs and outputs are in degrees.  Units
         can be 'deg' or 'rad'
     """
-    
-    units_in,units_out = units
+
+    units_in, units_out = units
 
     # note x,y,z from eq2xyz always returns 8-byte float
-    x1,y1,z1 = eq2xyz(ra1, dec1, units=units_in)
-    x2,y2,z2 = eq2xyz(ra2, dec2, units=units_in)
+    x1, y1, z1 = eq2xyz(ra1, dec1, units=units_in)
+    x2, y2, z2 = eq2xyz(ra2, dec2, units=units_in)
 
     costheta = x1*x2 + y1*y2 + z1*z2
-    costheta.clip(-1.0,1.0,out=costheta)
+    costheta.clip(-1.0, 1.0, out=costheta)
 
     theta = arccos(costheta)
 
     if units_out == 'deg':
-        numpy.rad2deg(theta,theta)
+        numpy.rad2deg(theta, theta)
     return theta
 
 
-def gcirc(ra1deg,dec1deg,ra2deg,dec2deg,getangle=False):
+def gcirc(ra1deg, dec1deg, ra2deg, dec2deg, getangle=False):
     """
     This is currently very inflexible: degrees in, radians out
     """
-    ra1  = numpy.array(ra1deg, dtype='f8',ndmin=1)
-    dec1 = numpy.array(dec1deg,dtype='f8',ndmin=1)
-    ra2  = numpy.array(ra2deg, dtype='f8',ndmin=1)
-    dec2 = numpy.array(dec2deg,dtype='f8',ndmin=1)
+    ra1 = numpy.array(ra1deg, dtype='f8', ndmin=1)
+    dec1 = numpy.array(dec1deg, dtype='f8', ndmin=1)
+    ra2 = numpy.array(ra2deg, dtype='f8', ndmin=1)
+    dec2 = numpy.array(dec2deg, dtype='f8', ndmin=1)
 
-    deg2rad(ra1,ra1)
-    deg2rad(dec1,dec1)
-    deg2rad(ra2,ra2)
-    deg2rad(dec2,dec2)
+    deg2rad(ra1, ra1)
+    deg2rad(dec1, dec1)
+    deg2rad(ra2, ra2)
+    deg2rad(dec2, dec2)
 
     sindec1 = sin(dec1)
     cosdec1 = cos(dec1)
@@ -537,35 +541,38 @@ def gcirc(ra1deg,dec1deg,ra2deg,dec2deg,getangle=False):
     cosradiff = cos(radiff)
     cosdis = sindec1*sindec2 + cosdec1*cosdec2*cosradiff
 
-    cosdis.clip(-1.0,1.0,out=cosdis)
+    cosdis.clip(-1.0, 1.0, out=cosdis)
     dis = arccos(cosdis)
 
     if getangle:
-        theta = arctan2( sin(radiff), 
-                         (sindec1*cosradiff - cosdec1*sindec2/cosdec2) ) - HALFPI
-        return dis,theta
+        theta = arctan2(sin(radiff),
+                        (sindec1*cosradiff - cosdec1*sindec2/cosdec2)) - HALFPI
+        return dis, theta
     else:
         return dis
 
 # utility functions
+
+
 def atbound(longitude, minval, maxval):
     w, = numpy.where(longitude < minval)
     while w.size > 0:
         longitude[w] += 360.0
-        w, = numpy.where( longitude < minval )
+        w, = numpy.where(longitude < minval)
 
     w, = numpy.where(longitude > maxval)
     while w.size > 0:
         longitude[w] -= 360.0
-        w, = numpy.where( longitude > maxval )
+        w, = numpy.where(longitude > maxval)
 
     return
+
 
 def atbound2(theta, phi):
 
     atbound(theta, -180.0, 180.0)
 
-    w, = numpy.where( numpy.abs(theta) > 90.0 )
+    w, = numpy.where(numpy.abs(theta) > 90.0)
     if w.size > 0:
         theta[w] = 180.0 - theta[w]
         phi[w] += 180.0
@@ -573,10 +580,10 @@ def atbound2(theta, phi):
     atbound(theta, -180.0, 180.0)
     atbound(phi, 0.0, 360.0)
 
-    w, = numpy.where( numpy.abs(theta) == 90.0 )
+    w, = numpy.where(numpy.abs(theta) == 90.0)
     if w.size > 0:
         phi[w] = 0.0
-           
+
 #
 # SDSS specific conversions
 #
@@ -610,7 +617,7 @@ def eq2sdss(ra_in, dec_in, dtype='f8'):
     OUTPUTS: 
       clambda: Corrected Survey longitude (actually lattitude) in degrees
       ceta: Corrected Survey latitude (actually logitude) in degrees
-      
+
     REVISION HISTORY:
       Written: 11-March-2006  Converted from IDL program.
     """
@@ -634,33 +641,36 @@ def eq2sdss(ra_in, dec_in, dtype='f8'):
 
     # generate x,y,z on unit sphere, clearing memory as we go
     cdec = cos(dec)
-    
+
     x = cos(ra)*cdec
     y = sin(ra)*cdec
 
-    ra = 0; cdec = 0 # mem 
-    
+    ra = 0
+    cdec = 0 # mem
+
     z = numpy.sin(dec)
-    
+
     dec = 0 # mem
 
     # generate clambda, ceta
     # do things in place to save memory
 
     # clambda = -arcsin( x ) (not a copy clambda=x)
-    arcsin(x, x); clambda=x
+    arcsin(x, x)
+    clambda = x
     clambda *= -1
 
-    
-    arctan2( z, y, z); ceta = z
+    arctan2(z, y, z)
+    ceta = z
     ceta -= _sdsspar['etapole']
 
     clambda *= R2D
     ceta *= R2D
 
     atbound(ceta, -180.0, 180.0)
-    
+
     return (clambda, ceta)
+
 
 def sdss2eq(clambda_in, ceta_in, dtype='f8'):
     """
@@ -684,11 +694,11 @@ def sdss2eq(clambda_in, ceta_in, dtype='f8'):
     OUTPUTS: 
       ra: Equatorial latitude in degrees. 
       dec: Equatorial longitude in degrees. 
-      
+
     REVISION HISTORY:
       Written: 11-March-2006  Converted from IDL program.
     """
-    
+
     # Make a copy as an array. ndmin=1 to avoid messed up scalar arrays
     clambda = numpy.array(clambda_in, ndmin=1, copy=True, dtype=dtype)
     ceta = numpy.array(ceta_in, ndmin=1, copy=True, dtype=dtype)
@@ -700,20 +710,20 @@ def sdss2eq(clambda_in, ceta_in, dtype='f8'):
         raise ValueError('CETA must we within [-180,180]')
 
     clambda *= D2R
-    ceta    *= D2R
+    ceta *= D2R
 
     x = -sin(clambda)
     y = cos(ceta + _sdsspar['etapole'])*cos(clambda)
     z = sin(ceta + _sdsspar['etapole'])*cos(clambda)
-    
-    ra = arctan2( y, x ) + _sdsspar['node']
+
+    ra = arctan2(y, x) + _sdsspar['node']
     dec = arcsin(z)
 
-    ra  *= R2D
+    ra *= R2D
     dec *= R2D
     atbound2(dec, ra)
 
-    return (ra,dec)
+    return (ra, dec)
 
 
 def _eq2survey(ra_in, dec_in, dtype='f8'):
@@ -739,7 +749,7 @@ def _eq2survey(ra_in, dec_in, dtype='f8'):
     OUTPUTS: 
       lambda: SDSS Survey longitude (actually lattitude) in degrees
       eta: SDSS Survey latitude (actually logitude) in degrees
-      
+
     REVISION HISTORY:
       Written: 11-March-2006  Converted from IDL program.
     """
@@ -757,33 +767,33 @@ def _eq2survey(ra_in, dec_in, dtype='f8'):
     if (dec.min() < -90.0) | (dec.max() > 90.0):
         raise ValueError('DEC must we within [-90,90]')
 
-
-
     ra *= D2R
     dec *= D2R
     ra -= _sdsspar['node']
 
     # generate x,y,z on unit sphere, clearing memory as we go
     cdec = cos(dec)
-    
+
     x = cos(ra)*cdec
     y = sin(ra)*cdec
 
-    ra = 0; cdec = 0 # mem 
-    
+    ra = 0
+    cdec = 0 # mem
+
     z = sin(dec)
-    
+
     dec = 0 # mem
 
     # generate lam, eta
     # do things in place to save memory
 
     # lam = -arcsin( x ) (not a copy lam=x)
-    arcsin(x, x); lam=x
+    arcsin(x, x)
+    lam = x
     lam *= -1
 
-    
-    arctan2( z, y, z); eta = z
+    arctan2(z, y, z)
+    eta = z
     eta -= _sdsspar['etapole']
 
     lam *= R2D
@@ -792,10 +802,10 @@ def _eq2survey(ra_in, dec_in, dtype='f8'):
     atbound2(lam, eta)
     atbound(eta, -180.0, 180.0)
 
-    w, = numpy.where( eta > (90.0 - _sdsspar['center_dec']) )
+    w, = numpy.where(eta > (90.0 - _sdsspar['center_dec']))
     if w.size > 0:
         eta[w] -= 180.0
-        lam[w]  = 180.0 - lam[w]
+        lam[w] = 180.0 - lam[w]
 
     atbound(lam, -180.0, 180.0)
 
@@ -820,16 +830,16 @@ def _survey2eq(ra, dec, dtype='f8'):
     OPTIONAL INPUTS:
         dtype: The data type of output.  Default is 'f8'. See 
         numpy.typeDict for a list of possible types.
-      
+
     OUTPUTS: 
       ra: Equatorial latitude in degrees. 
       dec: Equatorial longitude in degrees. 
-      
+
     REVISION HISTORY:
       Written: 11-March-2006  Converted from IDL program.
     """
 
-    return csurvey2eq(ra,dec, dtype=dtype)
+    return csurvey2eq(ra, dec, dtype=dtype)
 
 
 def dec_parse(decstring):
@@ -853,6 +863,7 @@ def dec_parse(decstring):
         sec = float(ds[2])
         dec += sec/3600.0
     return dec
+
 
 def ra_parse(rastring, hours=True):
     """
@@ -886,12 +897,11 @@ def fitsheader2dict(hdr, ext=0):
     transformation.
     """
 
-    hdict={}
+    hdict = {}
     for key in hdr:
         hdict[key.lower()] = hdr[key]
 
     return hdict
-
 
 
 def shiftlon(lon_input, shift=None, wrap=True):
@@ -908,7 +918,7 @@ def shiftlon(lon_input, shift=None, wrap=True):
 
         If the shift keyword is sent, then the longitude is simply shifted by
         the input value and then constrained to be again on the [0,360) range.
-    
+
     Input:
         A longitude or array of longitudes on the range [0,360)
 
@@ -916,7 +926,7 @@ def shiftlon(lon_input, shift=None, wrap=True):
         shift: 
             If shift is sent, then lon-shift is returned, constrained to still
             be on [0,360).
-        
+
         wrap: 
             If shift is not sent, and wrap is True, wrap the range to
             [-180,180]
@@ -927,7 +937,7 @@ def shiftlon(lon_input, shift=None, wrap=True):
     if shift is not None:
         negshift = False
         if shift < 0:
-            negshift=True
+            negshift = True
 
         abs_shift = abs(shift)
 
@@ -948,12 +958,11 @@ def shiftlon(lon_input, shift=None, wrap=True):
                 lon[w] += 360.0
 
     elif wrap:
-        w,=where(lon > 180)
+        w, = where(lon > 180)
         if w.size > 0:
             lon[w] -= 360
 
     return lon
-
 
 
 def shiftra(ra, shift=None, wrap=True):
@@ -970,7 +979,7 @@ def shiftra(ra, shift=None, wrap=True):
 
         If the shift keyword is sent, then the longitude is simply shifted by
         the input value and then constrained to be again on the [0,360) range.
-    
+
     Input:
         ra or any other longitude on the range [0,360)
 
@@ -979,14 +988,13 @@ def shiftra(ra, shift=None, wrap=True):
 
             If shift is sent, then ra-shift is returned, constrained to still
             be on [0,360).
-        
+
         wrap: 
             If shift is not sent, and wrap is True, wrap the range to
             [-180,180]
 
     """
     return shiftlon(ra, shift=shift, wrap=wrap)
-
 
 
 def radec2aitoff(ra, dec):
@@ -997,14 +1005,13 @@ def radec2aitoff(ra, dec):
     r2 = numpy.sqrt(2.0)
     f = 2.*r2/PI
 
-
     sra = shiftra(ra)
 
     alpha2 = sra/2.*D2R
     delta = dec*D2R
 
     cdec = cos(delta)
-    
+
     denom = sqrt(1.0 + cdec*cos(alpha2))
 
     x = cdec*sin(alpha2)*2.*r2/denom
@@ -1012,7 +1019,7 @@ def radec2aitoff(ra, dec):
     x = x*R2D/f
     y = y*R2D/f
 
-    crap="""
+    crap = """
     sa = l
     if N_elements(sa) eq 1 then sa = fltarr(1) + sa
     x180 = where (sa gt 180.0)
@@ -1029,18 +1036,20 @@ def radec2aitoff(ra, dec):
     y = y*!radeg/f
     """
 
-    return x,y
+    return x, y
+
 
 def _check_range(rng, allowed):
     if rng is None:
         rng = allowed
     else:
-        if not hasattr(rng,'__len__'):
+        if not hasattr(rng, '__len__'):
             raise ValueError("range object does not have len() method")
 
         if rng[0] < allowed[0] or rng[1] > allowed[1]:
             raise ValueError("lon_range should be within [%s,%s]" % allowed)
     return rng
+
 
 def randsphere(num, ra_range=None, dec_range=None, system='eq'):
     """
@@ -1074,8 +1083,8 @@ def randsphere(num, ra_range=None, dec_range=None, system='eq'):
 
     """
 
-    ra_range = _check_range(ra_range, [0.0,360.0])
-    dec_range = _check_range(dec_range, [-90.0,90.0])
+    ra_range = _check_range(ra_range, [0.0, 360.0])
+    dec_range = _check_range(dec_range, [-90.0, 90.0])
 
     ra = numpy.random.random(num)
     ra *= (ra_range[1]-ra_range[0])
@@ -1089,20 +1098,21 @@ def randsphere(num, ra_range=None, dec_range=None, system='eq'):
     v *= (cosdec_max-cosdec_min)
     v += cosdec_min
 
-    numpy.clip(v,-1.0,1.0,v)
+    numpy.clip(v, -1.0, 1.0, v)
     # Now this generates on [0,pi)
     dec = numpy.arccos(v)
 
     # convert to degrees
-    rad2deg(dec,dec)
+    rad2deg(dec, dec)
     # now in range [-90,90.0)
     dec -= 90.0
-    
+
     if system == 'xyz':
-        x,y,z = eq2xyz(ra, dec)
-        return x,y,z
+        x, y, z = eq2xyz(ra, dec)
+        return x, y, z
     else:
         return ra, dec
+
 
 def randcap(nrand, ra, dec, rad, get_radius=False):
     """
@@ -1127,17 +1137,17 @@ def randcap(nrand, ra, dec, rad, get_radius=False):
     rand_r = sqrt(rand_r)*rad
 
     # put in degrees
-    numpy.deg2rad(rand_r,rand_r)
+    numpy.deg2rad(rand_r, rand_r)
 
     # generate position angle uniformly 0,2*PI
     rand_posangle = numpy.random.random(nrand)*2*PI
 
-    theta = numpy.array(dec, dtype='f8',ndmin=1,copy=True)
-    phi = numpy.array(ra,dtype='f8',ndmin=1,copy=True)
+    theta = numpy.array(dec, dtype='f8', ndmin=1, copy=True)
+    phi = numpy.array(ra, dtype='f8', ndmin=1, copy=True)
     theta += 90
 
-    numpy.deg2rad(theta,theta)
-    numpy.deg2rad(phi,phi)
+    numpy.deg2rad(theta, theta)
+    numpy.deg2rad(phi, phi)
 
     sintheta = sin(theta)
     costheta = cos(theta)
@@ -1150,7 +1160,7 @@ def randcap(nrand, ra, dec, rad, get_radius=False):
     cospsi = cos(rand_posangle)
     costheta2 = costheta*cosr + sintheta*sinr*cospsi
 
-    numpy.clip(costheta2, -1, 1, costheta2)                    
+    numpy.clip(costheta2, -1, 1, costheta2)
 
     # gives [0,pi)
     theta2 = arccos(costheta2)
@@ -1158,15 +1168,15 @@ def randcap(nrand, ra, dec, rad, get_radius=False):
 
     cosDphi = (cosr - costheta*costheta2)/(sintheta*sintheta2)
 
-    numpy.clip(cosDphi, -1, 1, cosDphi)                    
+    numpy.clip(cosDphi, -1, 1, cosDphi)
     Dphi = arccos(cosDphi)
 
     # note fancy usage of where
-    phi2=numpy.where(rand_posangle > PI, phi+Dphi, phi-Dphi)
+    phi2 = numpy.where(rand_posangle > PI, phi+Dphi, phi-Dphi)
 
-    numpy.rad2deg(phi2,phi2)
-    numpy.rad2deg(theta2,theta2)
-    rand_ra  = phi2
+    numpy.rad2deg(phi2, phi2)
+    numpy.rad2deg(theta2, theta2)
+    rand_ra = phi2
     rand_dec = theta2-90.0
 
     if get_radius:

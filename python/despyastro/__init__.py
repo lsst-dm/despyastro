@@ -1,9 +1,7 @@
-__author__  = "Felipe Menanteau"
+"""A collection of Astro-related Python functions useful for DESDM.
+"""
 
-"""
- A collection of Astro-related Python functions useful for DESDM
- Python-based modules
-"""
+__author__ = "Felipe Menanteau"
 
 from . import astrometry
 from . import coords
