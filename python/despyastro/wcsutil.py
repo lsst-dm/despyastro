@@ -13,8 +13,8 @@ Examples:
     # Use a fits header as initialization to a WCS class and convert
     # image (x,y) to equatorial longitude,latitude (ra,dec)
     import wcsutil
-    import pyfits
-    hdr=pyfits.getheader(fname)
+    from astropy.io import fits
+    hdr=fits.getheader(fname)
     wcs = wcsutil.WCS(hdr)
 
     # convert x,y to ra,dec. x,y can be scalars or numpy arrays.  
@@ -169,8 +169,8 @@ class WCS(object):
         # Use a fits header as initialization to a WCS class and convert
         # image (x,y) to equatorial longitude,latitude (ra,dec)
         import wcsutil
-        import pyfits
-        hdr=pyfits.getheader(fname)
+        from astropy.io import fits
+        hdr=fits.getheader(fname)
         wcs = wcsutil.WCS(hdr)
 
         # convert x,y to ra,dec. x,y can be scalars or numpy arrays.  
@@ -282,8 +282,8 @@ class WCS(object):
                 lon,lat
         Example:
             import wcsutil
-            import pyfits
-            hdr=pyfits.getheader(fname)
+            from astropy.io import fits
+            hdr=fits.getheader(fname)
             wcs = wcsutil.WCS(hdr)
             x,y = wcs.image2sky(ra,dec)
         """
